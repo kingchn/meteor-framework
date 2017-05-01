@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.kingchn</groupId>
+	<artifactId>meteor-framework</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Meteor :: Framework</name>
+	<packaging>pom</packaging>
+
+	<description>Meteor Framework</description>
+	<url>https://github.com/kingchn/meteor-framework.git</url>
+	<inceptionYear>2016-2017</inceptionYear>
+	<organization>
+	</organization>
+
+	<developers>
+		<developer>
+			<id>shenjc</id>
+			<name>shenjincheng</name>
+			<email>shenjc@qq.com</email>
+			<roles>
+				<role>Project leader</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+	</developers>
+
+	<licenses>
+		<license>
+		</license>
+	</licenses>
+
+</project>
