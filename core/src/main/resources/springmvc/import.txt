@@ -1,0 +1,11 @@
+	<import resource="classpath*:/springmvc/spring-mvc-objectMapper.xml" />
+	<import resource="classpath*:/springmvc/spring-mvc-messageConverters.xml" />
+	<import resource="classpath*:/springmvc/spring-mvc-jsonp.xml" />
+	<import resource="classpath*:/springmvc/spring-mvc-contentNegotiating.xml" />
+	<!-- <import resource="classpath*:/springmvc/spring-mvc-jsp.xml" /> -->
+	<import resource="classpath*:/springmvc/spring-mvc-freemarker.xml" />
+	
+	<!-- <mvc:annotation-driven /> -->
+	<import resource="classpath*:/springmvc/spring-mvc-openApi.xml" />	
+	
+    <import resource="classpath*:/springmvc/spring-mvc-exception.xml" />

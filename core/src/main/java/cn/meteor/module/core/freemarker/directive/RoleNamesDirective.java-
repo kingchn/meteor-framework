@@ -1,0 +1,29 @@
+package cn.meteor.freemarker.directive;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
+import freemarker.core.Environment;
+import freemarker.template.SimpleSequence;
+import freemarker.template.TemplateDirectiveBody;
+import freemarker.template.TemplateDirectiveModel;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateModel;
+
+public class RoleNamesDirective implements TemplateDirectiveModel {
+
+	@Override
+	public void execute(Environment env, Map params, TemplateModel[] loopVars,
+			TemplateDirectiveBody body) throws TemplateException, IOException {
+		
+		List<Long> roleIds = null;
+		if(params.get("roleIds") != null){  
+			roleIds=((SimpleSequence)params.get("roleIds")).toList();
+        }
+		
+		String roleNames = TagFunctions.roleNames(roleIds);
+		env.getOut().write(roleNames);
+	}
+
+}

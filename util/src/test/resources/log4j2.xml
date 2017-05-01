@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <!-- <PatternLayout pattern="%d{HH:mm:ss.SSS}=dev= [%t] %-5level %logger{36} - %msg%n"/> -->
+      <PatternLayout pattern="%d{HH:mm:ss.SSS}=dev= %-5level %logger{36}(%L) - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Logger name="org.springframework.core" level="info" />
+    <Logger name="org.springframework.jdbc" level="info" />
+    <Logger name="org.springframework.web" level="debug" additivity="false">
+      <AppenderRef ref="console"/>
+    </Logger>
+    <Logger name="org.springframework.beans" level="info" />
+    <!-- <Logger name="cn.meteor" level="debug" additivity="false">
+      <AppenderRef ref="console"/>
+      <AppenderRef ref="rollingFile"/>
+      <AppenderRef ref="rollingFile_error"/>
+    </Logger> -->
+    <Logger name="cn.meteor" level="info" />
+    <Logger name="com.foresee.dzfp" level="debug" />
+    <Root level="info">
+      <AppenderRef ref="console"/>
+    </Root>
+  </Loggers>
+</Configuration>

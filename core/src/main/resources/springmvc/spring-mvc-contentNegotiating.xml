@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<description>设置序列化成json及xml的视图解析器 依赖于 spring-mvc-objectMapper.xml</description>
+	
+	
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver"><!-- 提供支持对响应、特别是错误响应的序列化 -->
+		<!-- <property name="contentNegotiationManager" ref="contentNegotiationManager" /> -->
+		<property name="defaultViews">
+				<list>				
+				    <bean  class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
+						<property name="objectMapper" ref="objectMapperForJson" />
+					</bean>
+				    <bean  class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView">
+						<property name="objectMapper" ref="objectMapperForXml" />
+				    </bean>		    
+				</list>
+		</property>		
+	</bean>
+	
+</beans>

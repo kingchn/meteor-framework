@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<description>objectMapper定义对象映射json和xml的细节特性</description>
+	
+
+	<bean id="jacksonAnnotationIntrospector" class="com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector" />
+	<bean id="restJacksonAnnotationIntrospector" class="cn.meteor.module.core.openApi.annotation.RestJacksonAnnotationIntrospector" /><!-- json命名规则控制 -->
+	<bean id="jaxbAnnotationIntrospector" class="com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector" />	
+	<bean id="xmlJaxbAnnotationIntrospector" class="com.fasterxml.jackson.dataformat.xml.jaxb.XmlJaxbAnnotationIntrospector" />
+	
+	
+	
+
+
+	<!-- <bean class="cn.meteor.module.core.openApi.RestObjectMapping"></bean> -->
+    <!-- <bean class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"> -->
+    <!-- 不启用环绕根元素的objectMapperForJson -->
+    <bean id="objectMapperForJson"  class="cn.meteor.module.core.openApi.objectmapper.RestJackson2ObjectMapperFactoryBean"
+    	p:annotationIntrospector-ref="restJacksonAnnotationIntrospector">
+		<property name="featuresToEnable">
+			<array>
+				<!--<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRAP_ROOT_VALUE" /> --><!-- 启用环绕根元素 -->
+			</array>
+		</property>
+		<property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/>
+		<property name="nullValueSerializer"><!-- 空值转化为空字符串 -->
+			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
+		</property>
+	</bean>
+	
+	<!-- 启用环绕根元素的objectMapperForJson -->
+	<bean id="objectMapperForJsonWrapRootValue"  class="cn.meteor.module.core.openApi.objectmapper.RestJackson2ObjectMapperFactoryBean"
+    	p:annotationIntrospector-ref="restJacksonAnnotationIntrospector">
+		<property name="featuresToEnable">
+			<array>
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRAP_ROOT_VALUE" /><!-- 启用环绕根元素 -->
+			</array>
+		</property>
+		<property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/>
+		<property name="nullValueSerializer"><!-- 空值转化为空字符串 -->
+			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
+		</property>
+	</bean>
+	
+	<!-- <bean class="cn.meteor.module.core.openApi.RestXmlObjectMapper"></bean> -->
+     <!-- <bean id="objectMapperForXml" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"> -->
+    <bean id="objectMapperForXml" class="cn.meteor.module.core.openApi.objectmapper.RestJackson2ObjectMapperFactoryBean"
+    	><!-- 针对RestJsonRootName注解的实体名字序列化控制 --><!-- p:annotationIntrospector-ref="restJacksonAnnotationIntrospector" -->
+    	<property name="createXmlMapper" value="true" /><!-- 用来创建com.fasterxml.jackson.dataformat.xml.XmlMapper -->
+    		<property name="featuresToEnable">
+				<array>
+					<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRAP_ROOT_VALUE" /><!-- 启用环绕根元素 -->
+					<util:constant static-field="com.fasterxml.jackson.databind.MapperFeature.USE_ANNOTATIONS"/>			
+				</array>
+		</property>
+		<property name="xmlFeaturesToEnable">
+				<array>
+					<util:constant static-field="com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator.Feature.WRITE_XML_DECLARATION"/>
+					<!-- <util:constant static-field="com.fasterxml.jackson.dataformat.xml.ser.ToXmlGenerator.Feature.WRITE_XML_1_1"/> -->
+				</array>
+		</property>
+	</bean>
+	
+	
+</beans>

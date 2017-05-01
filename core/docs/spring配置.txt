@@ -1,0 +1,13 @@
+
+
+    <bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+        <property name="basenames" value="${core.openApi.messageSource.basenames:openApi/i18n/error/error}" />
+         <!-- <property name="basenames">
+            <list>
+               <value>properties/openApi/i18n/error/error</value>
+                <value>openApi/i18n/error/error</value>
+            </list>
+        </property> -->
+    </bean>
+    
+    core.openApi.messageSource.basenames=properties/common/openApi/i18n/error/error,openApi/i18n/error/error

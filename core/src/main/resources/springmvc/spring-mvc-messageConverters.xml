@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<description>设置消息转换器 依赖于 spring-mvc-objectMapper.xml</description>
+
+
+	<!-- 返回类型定义 -->  
+    <util:list id="messageConverters">  
+        <!-- <ref bean="stringHttpMessageConverter" /> -->
+        <ref bean="mappingJackson2HttpMessageConverter" />
+        <ref bean="mappingJackson2XmlHttpMessageConverter" />
+    </util:list>
+    
+    
+    <bean id="stringHttpMessageConverter" class="org.springframework.http.converter.StringHttpMessageConverter">
+    	<constructor-arg value="UTF-8" />	<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
+		<property name="supportedMediaTypes">
+		    <list>
+		        <value>text/plain;charset=UTF-8</value>
+			    <value>application/json;charset=UTF-8</value>
+			    <value>application/xml; charset=UTF-8</value>
+		    </list>
+		</property>
+	</bean>
+	
+			
+	<bean id="mappingJackson2HttpMessageConverter" class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+		<property name="prettyPrint" value="true"/>	<!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+		<property name="supportedMediaTypes">
+			<list>
+			    <value>text/html;charset=UTF-8</value><!-- 避免IE出现下载JSON文件的情况 -->
+			    <value>application/json;charset=UTF-8</value>
+			    <value>application/javascript; charset=UTF-8</value>
+			</list>
+		</property>
+		<property name="objectMapper" ref="objectMapperForJsonWrapRootValue" />
+     </bean>
+     
+     
+     
+     
+     <bean id="mappingJackson2XmlHttpMessageConverter" class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+		<property name="prettyPrint" value="true"/>
+		<property name="supportedMediaTypes">
+			<list>
+			    <value>application/xml; charset=UTF-8</value>
+			    <value>text/xml;charset=UTF-8</value>
+			</list>
+		</property>
+		<property name="objectMapper" ref="objectMapperForXml" />
+     </bean>
+    
+  
+    
+	
+</beans>

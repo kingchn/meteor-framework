@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:c="http://www.springframework.org/schema/c"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+	<description>jsonp设置</description>
+    
+    
+    <bean id="jsonpAdvice" class="cn.meteor.module.core.openApi.advice.JsonpAdvice" >
+    	<constructor-arg value="${core.openApi.jsonpAdvice.callbackParamName:callback}" />
+    </bean>
+    <util:list id="requestResponseBodyAdvice">  
+        <ref bean="jsonpAdvice" />
+    </util:list>
+	
+</beans>

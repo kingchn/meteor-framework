@@ -1,0 +1,16 @@
+# Output pattern : date [thread] priority category - message
+#log4j.rootLogger=WARN, Console, RollingFile
+log4j.rootLogger=INFO, Console
+#log4j.rootLogger=DEBUG, Console
+
+#Console
+log4j.appender.Console=org.apache.log4j.ConsoleAppender
+log4j.appender.Console.layout=org.apache.log4j.PatternLayout
+log4j.appender.Console.layout.ConversionPattern=%d- %p [%t] %C.%M(%L) | %m%n
+#log4j.appender.Console.encoding=UTF-8
+#log4j.appender.Console.encoding=GBK
+
+#Project defalult level
+#log4j.logger.com.eshore.food=INFO
+
+#log4j.logger.org.hibernate.SQL=DEBUG

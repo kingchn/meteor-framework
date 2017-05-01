@@ -1,0 +1,344 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.github.kingchn</groupId>
+	<artifactId>meteor-core</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+	<name>Meteor :: Module :: Core</name>
+	<organization>
+	</organization>
+	
+	
+	<properties>
+		<!-- 主要依赖库的版本定义 -->
+		<spring.version>4.3.7.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
+		<spring-data-jpa.version>1.11.1.RELEASE</spring-data-jpa.version><!-- 1.4.2.RELEASE 1.10.1.RELEASE 1.11.1.RELEASE -->
+		<aspectj.version>1.8.9</aspectj.version><!-- 1.7.3 1.8.9 -->
+		<servlet-api.version>3.0.1</servlet-api.version><!-- 3.0.1 3.1.0 -->
+		<meteor.version>1.0.0-SNAPSHOT</meteor.version>
+		<commons-io.version>2.5</commons-io.version><!-- 2.4 -->
+		<commons-fileupload.version>1.3.2</commons-fileupload.version><!-- 1.2.2 1.3.2 -->
+		<commons-collections.version>3.2.2</commons-collections.version><!-- 3.2.1 3.2.2 -->		
+		<jodd.version>3.7</jodd.version>
+		<log4j.version>2.8.1</log4j.version>
+		<jackson.version>2.8.6</jackson.version><!-- 2.3.1 -->
+		<validation-api.version>1.1.0.Final</validation-api.version>
+		<hibernate.version>5.1.3.Final</hibernate.version><!-- 4.3.11.Final 5.2.5.Final 5.2.6.Final 5.1.3.Final-->
+		<freemarker.version>2.3.23</freemarker.version><!-- 2.3.22 2.3.23 -->
+		<pagehelper.version>5.0.0</pagehelper.version><!-- 3.7.3 5.0.0 -->
+		<shiro.version>1.3.2</shiro.version><!-- 1.2.3 -->
+		<junit.version>4.12</junit.version>
+		
+		
+		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.7</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		
+	</properties>
+
+	<dependencies>	
+		<!-- spring start -->		
+		<!-- spring-webmvc依赖（spring-web依赖spring-context） -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>		
+		
+		<!-- spring集成freemarker需要 -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+        
+        <!-- spring-data-jpa包含aspectjrt；spring-data-jpa包含spring-orm(包含spring-jdbc、spring-tx)、spring-aop-->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-jpa</artifactId>
+			<version>${spring-data-jpa.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>junit</groupId>
+					<artifactId>junit-dep</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+        <!-- spring end -->               
+        
+		<!-- <dependency>
+		    <groupId>com.github.darrachequesne</groupId>
+		    <artifactId>spring-data-jpa-datatables</artifactId>
+		    <version>2.6</version>
+		</dependency> -->
+        
+        <!-- aspectj start -->
+        <!-- <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjrt</artifactId>
+			<version>${aspectj.version}</version>
+        </dependency> -->
+        <dependency>
+            <groupId>org.aspectj</groupId>
+            <artifactId>aspectjweaver</artifactId>
+			<version>${aspectj.version}</version>
+        </dependency>
+        <!-- aspectj start -->
+         
+        <!-- servlet-api start -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- servlet-api end -->
+        
+        <!-- meteor start -->
+		<dependency>
+			<groupId>com.github.kingchn</groupId>
+			<artifactId>meteor-util</artifactId>
+			<version>${meteor.version}</version>
+		</dependency>
+		<!-- meteor start -->		
+	
+		<!-- 工具类 start-->
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>${commons-io.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-fileupload</groupId>
+			<artifactId>commons-fileupload</artifactId>
+			<version>${commons-fileupload.version}</version>
+		</dependency>
+		<dependency>
+            <groupId>commons-collections</groupId>
+            <artifactId>commons-collections</artifactId>
+            <version>${commons-collections.version}</version>
+        </dependency>
+		<dependency>
+		    <groupId>org.jodd</groupId>
+		    <artifactId>jodd-core</artifactId>
+		    <version>${jodd.version}</version>
+		</dependency>
+		<!-- 工具类 end-->		
+		
+		<!-- 日志 begin -->
+		<dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+        </dependency>
+        <dependency>
+	        <groupId>org.apache.logging.log4j</groupId>
+	        <artifactId>log4j-web</artifactId>
+	    </dependency>
+	    <!-- Log4j 1.x API Bridge -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+		</dependency>
+		<!-- Apache Commons Logging Bridge -->
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-jcl</artifactId>
+		  </dependency>
+	    <!-- SLF4J Bridge 很多都有引用slf4j-api，另外spring-data-jpa1.4.2引用jcl-over-slf4j其实门面是jcl，引用slf4j-api，实现是slf4j ，这里我们可以继续转为log4j-->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+		</dependency>
+		<!-- <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>			
+			<version>1.0.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency> -->
+		<!-- 日志 end -->
+		
+		<!-- jackson start -->
+		<!-- jackson-databind包括jackson-core和jackson-annotations避免找不到类com.fasterxml.jackson.databind.PropertyNamingStrategy$SnakeCaseStrategy -->
+		<!-- <dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>${jackson.version}</version>
+		</dependency> -->
+		<!-- jackson-dataformat-xml包括jackson-databind（包括jackson-core和jackson-annotations）、jackson-module-jaxb-annotations -->
+		<dependency>
+		    <groupId>com.fasterxml.jackson.dataformat</groupId>
+		    <artifactId>jackson-dataformat-xml</artifactId>
+		    <version>${jackson.version}</version>
+		</dependency>
+		<!-- jackson end -->
+		
+		<!-- validation start  -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>${validation-api.version}</version>
+		</dependency>
+		<!-- validation end  -->
+		
+		<!-- hibernate start -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-entitymanager</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<!-- hibernate end -->
+		
+		<!-- freemarker start -->
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+			<version>${freemarker.version}</version>
+		</dependency>
+		<!-- freemarker end -->
+		
+		<!-- pagehelper start cn.meteor.module.core.freemarker.MyObjectWrapper需要pagehelper -->
+		<dependency>
+	      <groupId>com.github.pagehelper</groupId>
+	      <artifactId>pagehelper</artifactId>
+	      <version>${pagehelper.version}</version>
+	    </dependency>
+	    <!-- pagehelper end -->    
+
+		<!-- shiro start -->
+		<dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+			<version>${shiro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+			<version>${shiro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-ehcache</artifactId>
+			<version>${shiro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-quartz</artifactId>
+			<version>${shiro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring</artifactId>
+			<version>${shiro.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-cas</artifactId>
+            <version>${shiro.version}</version><!-- 1.2.2 -->
+            <exclusions>
+				<exclusion>
+					<groupId>javax.servlet</groupId>
+            		<artifactId>servlet-api</artifactId>
+				</exclusion>
+			</exclusions>
+        </dependency>
+		<!-- shiro end -->
+		
+		<!-- test start -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- test end -->
+	</dependencies>
+	
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>${spring.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+		      <groupId>org.apache.logging.log4j</groupId>
+		      <artifactId>log4j-bom</artifactId>
+		      <version>${log4j.version}</version>
+		      <scope>import</scope>
+		      <type>pom</type>
+		    </dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<!-- <configuration> <skip>true</skip> </configuration> -->
+			</plugin>
+		</plugins>
+	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration>
+					<configLocation>${basedir}/checkstyle/my_checks.xml</configLocation>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<configuration>
+					<xmlOutput>true</xmlOutput>
+					<effort>Max</effort>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>dashboard-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+	            <artifactId>maven-source-plugin</artifactId>
+	        </plugin>
+		</plugins>
+	</reporting>
+</project>

@@ -1,0 +1,28 @@
+package cn.meteor.freemarker.directive;
+
+import java.io.IOException;
+import java.util.Map;
+
+import freemarker.core.Environment;
+import freemarker.template.SimpleNumber;
+import freemarker.template.TemplateDirectiveBody;
+import freemarker.template.TemplateDirectiveModel;
+import freemarker.template.TemplateException;
+import freemarker.template.TemplateModel;
+
+public class OrganizationNameDirective implements TemplateDirectiveModel {
+
+	@Override
+	public void execute(Environment env, Map params, TemplateModel[] loopVars,
+			TemplateDirectiveBody body) throws TemplateException, IOException {
+		
+		Long organizationId = null;
+		if(params.get("organizationId") != null) {
+			organizationId=Long.valueOf(((SimpleNumber)params.get("organizationId")).getAsNumber().longValue());
+        }
+		
+		String orginizationName = TagFunctions.organizationName(organizationId);
+		env.getOut().write(orginizationName);
+	}
+
+}
