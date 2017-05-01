@@ -1,16 +1,50 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>9</version>
+    </parent>
 	<groupId>com.github.kingchn</groupId>
 	<artifactId>meteor-core</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Meteor :: Module :: Core</name>
-	<organization>
-	</organization>
-	
-	
-	<properties>
+	<description>
+		A Java Framework for JavaEE application reference architecture.
+	</description>
+	<url>https://github.com/kingchn/meteor-framework</url>
+	<organization></organization>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0</url>
+		</license>
+	</licenses>
+    <scm>
+        <connection>scm:git:git://github.com/kingchn/meteor-framework</connection>
+        <developerConnection>scm:git:git://github.com/kingchn/meteor-framework</developerConnection>
+        <url>https://github.com/kingchn/meteor-framework</url>
+    </scm>	
+	<developers>
+		<developer>
+			<id>shenjc</id>
+			<name>shenjincheng</name>
+			<email>shenjc@qq.com</email>
+		</developer>
+	</developers>
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/kingchn/meteor-framework/issues</url>
+    </issueManagement>
+    	
+	<properties>		
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>1.7</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		
 		<!-- 主要依赖库的版本定义 -->
 		<spring.version>4.3.7.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
 		<spring-data-jpa.version>1.11.1.RELEASE</spring-data-jpa.version><!-- 1.4.2.RELEASE 1.10.1.RELEASE 1.11.1.RELEASE -->
@@ -28,15 +62,7 @@
 		<freemarker.version>2.3.23</freemarker.version><!-- 2.3.22 2.3.23 -->
 		<pagehelper.version>5.0.0</pagehelper.version><!-- 3.7.3 5.0.0 -->
 		<shiro.version>1.3.2</shiro.version><!-- 1.2.3 -->
-		<junit.version>4.12</junit.version>
-		
-		
-		
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
-		
+		<junit.version>4.12</junit.version>		
 	</properties>
 
 	<dependencies>	
@@ -303,42 +329,70 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<!-- <configuration> <skip>true</skip> </configuration> -->
-			</plugin>
 		</plugins>
 	</build>
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration>
-					<configLocation>${basedir}/checkstyle/my_checks.xml</configLocation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<configuration>
-					<xmlOutput>true</xmlOutput>
-					<effort>Max</effort>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>dashboard-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-	            <artifactId>maven-source-plugin</artifactId>
-	        </plugin>
-		</plugins>
-	</reporting>
+	
+	 <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.2.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>2.9.1</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.5</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                	<id>sonatype-nexus-snapshots</id>
+					<name>Sonatype Nexus Snapshots</name>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <name>Nexus Release Repository</name>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 </project>

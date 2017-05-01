@@ -12,3 +12,7 @@
 target/
 logs/
 *.log
+
+package.bat
+install.bat
+deploy.bat
