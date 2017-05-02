@@ -3,6 +3,9 @@ package cn.meteor.module.util.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.dozer.DozerBeanMapper;
+import org.dozer.MappingException;
+
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
@@ -11,19 +14,46 @@ import ma.glasnost.orika.metadata.Type;
 import ma.glasnost.orika.metadata.TypeFactory;
 
 /**
- * 简单封装orika, 实现深度的BeanOfClasssA<->BeanOfClassB复制
+ * 封装orika, 实现深度的BeanOfClasssA<->BeanOfClassB复制	pom文件引用orika
  * 
- * 不要是用Apache Common BeanUtils进行类复制，每次就行反射查询对象的属性列表, 非常缓慢.
+ * 封装dozer，实现map和对象相互转换 pom文件引用dozer
  * 
- * 注意: 需要参考本模块的POM文件，显式引用orika.
+ * 不用Apache Common BeanUtils进行类复制，每次就行反射查询对象的属性列表, 非常缓慢.
+ * 
  */
 public class BeanMapper {
 
 	private static MapperFacade mapper;
+	
+	private static DozerBeanMapper dozerBeanMapper;
 
 	static {
 		MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 		mapper = mapperFactory.getMapperFacade();
+		
+		dozerBeanMapper = new DozerBeanMapper();
+	}
+	
+
+	/**
+	 * 适用于map转对象
+	 * @param source
+	 * @param destinationClass
+	 * @return
+	 * @throws MappingException
+	 */
+	public static <D> D mapWithDozer(Object source, Class<D> destinationClass) throws MappingException {
+		return dozerBeanMapper.map(source, destinationClass);
+	}
+	
+	/**
+	 * 适用于对象转map
+	 * @param source
+	 * @param destination
+	 * @throws MappingException
+	 */
+	public static void mapWithDozer(Object source, Object destination) throws MappingException {
+		dozerBeanMapper.map(source, destination);
 	}
 	
 	public <S, D> MapperFacade getCustomMapperFacade(Class<S> sourceClass, Class<D> destinationClass, Map<String, String> customMap) {

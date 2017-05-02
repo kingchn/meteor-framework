@@ -47,6 +47,7 @@
 		<commons-beanutils.version>1.8.3</commons-beanutils.version>
 		<poi.version>3.15</poi.version>
 		<orika.version>1.5.0</orika.version>
+		<dozer.version>5.5.1</dozer.version>
 		<junit.version>4.12</junit.version>		
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.4</commons-io.version>
@@ -115,13 +116,20 @@
 			<version>${poi.version}</version>
 		</dependency>
 		
-		<!-- for ObjectMapper -->
+		<!-- bean mapper start -->
 		<dependency>
 			<groupId>ma.glasnost.orika</groupId>
 			<artifactId>orika-core</artifactId>
 			<version>${orika.version}</version>
 			<!-- <optional>true</optional> -->
 		</dependency>		
+		
+		<dependency>
+		    <groupId>net.sf.dozer</groupId>
+		    <artifactId>dozer</artifactId>
+		    <version>${dozer.version}</version>
+		</dependency>
+		<!-- bean mapper end -->
 		
 		<!-- test start -->
         <dependency>
