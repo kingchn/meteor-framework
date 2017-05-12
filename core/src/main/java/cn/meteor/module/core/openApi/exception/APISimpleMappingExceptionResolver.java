@@ -81,19 +81,21 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 	protected ErrorResponse getErrorResponse(String viewName, Exception ex, HttpServletRequest request, Locale locale) {
 		ErrorResponse errorResponse = getErrorResponseAnalysisByKnownException(viewName, ex, request, locale);//对一些已知典型异常进行处理转换为errorResponse
 		if(errorResponse.getCode()==null) {//未匹配到异常信息
-			if(ex instanceof IsvException) {
-				IsvException isvException = (IsvException) ex;
-				errorResponse.setCode(isvException.getCode());
-				errorResponse.setMsg(isvException.getMsg());
-				errorResponse.setDetailCode(isvException.getDetailCode());
-				errorResponse.setDetailMsg(isvException.getDetailMsg());
-			} else if(ex instanceof IspException) {
+			if (ex instanceof IspException) {// 平台级子错误
 				IspException ispException = (IspException) ex;
 				errorResponse.setCode(ispException.getCode());
 				errorResponse.setMsg(ispException.getMsg());
 				errorResponse.setDetailCode(ispException.getDetailCode());
 				errorResponse.setDetailMsg(ispException.getDetailMsg());
-				}
+			} else if (ex instanceof IsvException) {// 业务级子错误
+				IsvException isvException = (IsvException) ex;
+//				errorResponse.setCode(isvException.getCode());
+//				errorResponse.setMsg(isvException.getMsg());
+				errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.BUSSINESS_ERROR));
+				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.BUSSINESS_ERROR, locale));
+				errorResponse.setDetailCode(isvException.getDetailCode());
+				errorResponse.setDetailMsg(isvException.getDetailMsg());
+			}
 		}
 		if(errorResponse!=null&&errorResponse.getCode()==null) {//未知错误
 			errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE));
@@ -164,12 +166,14 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 				errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.PARAMETER_ERROR));
 				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.PARAMETER_ERROR, locale));
 				
+				//设置详细错误信息
 				List<FieldError> fieldErrors =  ((BindException) ex).getBindingResult().getFieldErrors();
 				analysisFiledErrorToErrorResponse(errorResponse,fieldErrors,locale);
 			} else if(ex instanceof MethodArgumentNotValidException) {
 				errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.PARAMETER_ERROR));
 				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.PARAMETER_ERROR, locale));
 				
+				//设置详细错误信息
 				List<FieldError> fieldErrors =  ((MethodArgumentNotValidException) ex).getBindingResult().getFieldErrors();
 				analysisFiledErrorToErrorResponse(errorResponse,fieldErrors,locale);
 			} else if(ex instanceof IllegalStateException) {
@@ -177,16 +181,23 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.PARAMETER_ERROR, locale));
 				IllegalStateException illegalStateException = (IllegalStateException) ex;
 				int i;
+				//设置详细错误信息
+				//TODO: 设置详细错误信息
 //				List<FieldError> fieldErrors =  ((IllegalStateException) ex).getBindingResult().getFieldErrors();
 //				analysisFiledErrorToErrorResponse(errorResponse,fieldErrors,locale);
 			} else if(ex instanceof NullPointerException) {
 				errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE));
 				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE, locale));
+				
+				//设置详细错误信息
 				errorResponse.setDetailCode(ErrorMsgUtils.getErrorCode(ErrorType.ISP_NULL_POINTER_EXCEPTION));
 				errorResponse.setDetailMsg(ErrorMsgUtils.getErrorMsg(ErrorType.ISP_NULL_POINTER_EXCEPTION, locale));
 			} else if(ex instanceof HttpRequestMethodNotSupportedException) {
 				errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.HTTP_ACTION_NOT_ALLOWED));
 				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.HTTP_ACTION_NOT_ALLOWED, locale));
+				
+				//设置详细错误信息
+				//TODO: 设置详细错误信息
 			}
 			
 		}		

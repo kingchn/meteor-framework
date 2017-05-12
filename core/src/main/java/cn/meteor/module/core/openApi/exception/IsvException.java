@@ -52,6 +52,12 @@ public class IsvException extends Exception {
         this.detailMsg = detailMsg;
     }
 	
+	public IsvException(String detailCode, String detailMsg) {
+		super(detailMsg);
+		this.detailCode=detailCode;
+		this.detailMsg = detailMsg;   
+    }
+	
 	public IsvException(String code, String msg, String detailCode, String detailMsg) {
 		super(detailMsg);
 		this.code = code;
