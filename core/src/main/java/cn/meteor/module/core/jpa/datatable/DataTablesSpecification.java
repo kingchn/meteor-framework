@@ -22,6 +22,15 @@ import cn.meteor.module.core.jpa.datatable.criteria.DataTablePaginationInputCrit
 
 
 
+/**
+ * columns[0][searchValue]=a 代表 =a
+ * columns[0][searchValue]=like_a 代表 like ‘%a%'
+ * columns[0][searchValue]=a+b+c 代表 in(a,b,c)
+ * 
+ * @author shenjc
+ *
+ * @param <T>
+ */
 public class DataTablesSpecification<T> implements Specification<T> {	
 	//import org.springframework.data.jpa.datatables.repository.DataTablesUtils.DataTablesPageRequest;
 	//import org.springframework.data.jpa.datatables.repository.SpecificationFactory;
@@ -39,6 +48,8 @@ public class DataTablesSpecification<T> implements Specification<T> {
 	public final static String ATTRIBUTE_SEPARATOR = ".";
 	public final static String ESCAPED_ATTRIBUTE_SEPARATOR = "\\.";
 	public final static char ESCAPE_CHAR = '\\';
+	
+	public final static String LIKE_SEARCH = "like_";
 	
 	public static boolean isBoolean(String filterValue) {
 		return "TRUE".equalsIgnoreCase(filterValue) || "FALSE".equalsIgnoreCase(filterValue);
@@ -104,7 +115,8 @@ public class DataTablesSpecification<T> implements Specification<T> {
             stringExpression = getExpression(root, column.get(ColumnCriterias.data), String.class);
             predicate = cb.and(predicate, stringExpression.in(Arrays.asList(values)));
           }
-        } else {//如果columns[0][search][value]不包含+；这种过滤说明只包含一个值，添加WHERE .. LIKE语句
+        } else if(filterValue.startsWith(LIKE_SEARCH)) {//如果columns[0][search][value],变种columns[0][searchValue]不包含+而是包含like；这种过滤说明只包含一个值，添加WHERE .. LIKE语句
+        		filterValue = filterValue	.replaceFirst(LIKE_SEARCH, "");
 				if (isBoolean(filterValue)) { // 如果过滤值是 true 或者 false
 					booleanExpression = getExpression(root, column.get(ColumnCriterias.data), Boolean.class);// 中间的参数为columns[0][data]即字段名
 					predicate = cb.and(predicate, cb.equal(booleanExpression, Boolean.valueOf(filterValue)));
@@ -113,7 +125,18 @@ public class DataTablesSpecification<T> implements Specification<T> {
 					predicate = cb.and(predicate, cb.like(cb.lower(stringExpression), getLikeFilterValue(filterValue), ESCAPE_CHAR));
 					//getLikeFilterValue(filterValue) 差不多是"%" +"a"+"%"； ESCAPE_CHAR是转移符
 				}
-        }
+        } else {//其他，即精确查找 添加WHERE .. =语句
+			if (isBoolean(filterValue)) { // 如果过滤值是 true 或者 false
+				booleanExpression = getExpression(root, column.get(ColumnCriterias.data), Boolean.class);// 中间的参数为columns[0][data]即字段名
+				predicate = cb.and(predicate, cb.equal(booleanExpression, Boolean.valueOf(filterValue)));
+			} else {
+				stringExpression = getExpression(root, column.get(ColumnCriterias.data), String.class);// 中间的参数为columns[0][data]即字段名
+//				predicate = cb.and(predicate, cb.like(cb.lower(stringExpression), getLikeFilterValue(filterValue), ESCAPE_CHAR));
+				//getLikeFilterValue(filterValue) 差不多是"%" +"a"+"%"； ESCAPE_CHAR是转移符
+//				Predicate p2 = cb.equal(root.get("abc").as(String.class), abc);
+				predicate = cb.and(predicate, cb.equal(stringExpression, filterValue) );
+			}
+    }
       }
 
       // 检测全局过滤值是否存在
