@@ -9,9 +9,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({"data", "recordsTotal", "recordsFiltered"})
+@JsonPropertyOrder({"code", "msg", "data", "recordsTotal", "recordsFiltered"})
 @JsonInclude(Include.NON_NULL)
-public class DataTablesResponse<T> extends BaseResponse {
+public class DataTableResponse<T> extends BaseResponse {
 	
 //	private Page<T> page;
 
