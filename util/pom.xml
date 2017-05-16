@@ -48,6 +48,7 @@
 		<poi.version>3.15</poi.version>
 		<orika.version>1.5.0</orika.version>
 		<dozer.version>5.5.1</dozer.version>
+		<zxing.version>3.1.0</zxing.version>
 		<junit.version>4.12</junit.version>		
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.4</commons-io.version>
@@ -130,6 +131,19 @@
 		    <version>${dozer.version}</version>
 		</dependency>
 		<!-- bean mapper end -->
+		
+		<!-- qrcode start -->
+		<dependency>
+		    <groupId>com.google.zxing</groupId>
+		    <artifactId>core</artifactId>
+		    <version>${zxing.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>com.google.zxing</groupId>
+		    <artifactId>javase</artifactId>
+		    <version>${zxing.version}</version>
+		</dependency>
+		<!-- qrcode start -->
 		
 		<!-- test start -->
         <dependency>
