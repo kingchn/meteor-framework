@@ -5,9 +5,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.ExcessiveAttemptsException;
+import org.apache.shiro.authc.SaltedAuthenticationInfo;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
+import org.apache.shiro.util.ByteSource;
 
 import cn.meteor.module.util.security.MD5Utils;
 
@@ -45,6 +47,13 @@ public class RetryLimitSimpleCredentialsMatcher extends SimpleCredentialsMatcher
   public boolean realDoCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
 	  boolean isMatch = false;
 	  String password = new String((char[])token.getCredentials()); //得到密码
+      if (info instanceof SaltedAuthenticationInfo) {
+    	  ByteSource byteSource = ((SaltedAuthenticationInfo) info).getCredentialsSalt();
+          String salt = new String(byteSource.getBytes());
+          password = password + "_" + salt;
+      } else {
+    	  
+      }
 	  try {
 		String passwordMd5 = MD5Utils.md5Digest(password);
 		String passwordStore = new String((char[])info.getCredentials()); //得到存储的密码
