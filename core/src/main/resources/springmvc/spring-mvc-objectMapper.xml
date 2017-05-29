@@ -27,6 +27,7 @@
 		<property name="featuresToEnable">
 			<array>
 				<!--<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRAP_ROOT_VALUE" /> --><!-- 启用环绕根元素 -->
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" /><!--  enable pretty-printing -->
 			</array>
 		</property>
 		<property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/>
@@ -41,6 +42,7 @@
 		<property name="featuresToEnable">
 			<array>
 				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRAP_ROOT_VALUE" /><!-- 启用环绕根元素 -->
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" /><!--  enable pretty-printing -->
 			</array>
 		</property>
 		<property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/>
