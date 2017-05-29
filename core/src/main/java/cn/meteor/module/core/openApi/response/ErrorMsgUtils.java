@@ -123,60 +123,66 @@ public class ErrorMsgUtils implements MessageSourceAware {
 //		String isvMissingParameterCode = messageSourceAccessor.getMessage(ErrorType.ISV_MISSING_PARAMETER.toString());
 //		errorCodeMap.put(ErrorType.ISV_MISSING_PARAMETER, isvMissingParameterCode);
 		
-		/********************************错误信息****************************************/
-		putErrorCodeMap(ErrorType.UPLOAD_FAIL);
-		putErrorCodeMap(ErrorType.APP_CALL_LIMITED);
-		putErrorCodeMap(ErrorType.HTTP_ACTION_NOT_ALLOWED);
-		putErrorCodeMap(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE);
-		putErrorCodeMap(ErrorType.INSUFFICIENT_ISV_PERMISSIONS);
-		putErrorCodeMap(ErrorType.INSUFFICIENT_USER_PERMISSIONS);
-		putErrorCodeMap(ErrorType.INSUFFICIENT_PARTNER_PERMISSIONS);
-		putErrorCodeMap(ErrorType.MISSING_METHOD);
-		putErrorCodeMap(ErrorType.INVALID_METHOD);
-		putErrorCodeMap(ErrorType.INVALID_FORMAT);
-		putErrorCodeMap(ErrorType.MISSING_SIGNATURE);
-		putErrorCodeMap(ErrorType.INVALID_SIGNATURE);
-		putErrorCodeMap(ErrorType.MISSING_SESSION);
-		putErrorCodeMap(ErrorType.INVALID_SESSION);
-		putErrorCodeMap(ErrorType.MISSING_APP_KEY);
-		putErrorCodeMap(ErrorType.INVALID_APP_KEY);
-		putErrorCodeMap(ErrorType.MISSING_TIMESTAMP);
-		putErrorCodeMap(ErrorType.INVALID_TIMESTAMP);
-		putErrorCodeMap(ErrorType.MISSING_VERSION);
-		putErrorCodeMap(ErrorType.INVALID_VERSION);
-		putErrorCodeMap(ErrorType.UNSUPPORTED_VERSION);
-		putErrorCodeMap(ErrorType.INSUFFICIENT_SESSION_PERMISSIONS);
-		putErrorCodeMap(ErrorType.PARAMETER_ERROR);
-		putErrorCodeMap(ErrorType.INVALID_ENCODING);
-
-		putErrorCodeMap(ErrorType.MISSING_SIGN_METHOD);
-		putErrorCodeMap(ErrorType.INVALID_SIGN_METHOD);
-
-		putErrorCodeMap(ErrorType.INVALID_BUSINESS_PARAMETER);
-
-		putErrorCodeMap(ErrorType.BUSSINESS_ERROR);//业务级错误(父级)
+		//遍历所有错误类型，存到errorCodeMap中
+		for (ErrorType errorType : ErrorType.values()) {
+			putErrorCodeMap(errorType);
+		}
 		
-        /********************************详细错误信息*************************************/
-		putErrorCodeMap(ErrorType.ISP_SERVICE_UNAVAILABLE);
-		putErrorCodeMap(ErrorType.ISP_REMOTE_SERVICE_ERROR);
-		putErrorCodeMap(ErrorType.ISP_REMOTE_SERVICE_TIMEOUT);
-		putErrorCodeMap(ErrorType.ISP_REMOTE_CONNECTION_ERROR);
-		putErrorCodeMap(ErrorType.ISP_NULL_POINTER_EXCEPTION);
-		putErrorCodeMap(ErrorType.ISP_MOP_PARSE_ERROR);
-		putErrorCodeMap(ErrorType.ISP_MOP_REMOTE_CONNECTION_TIMEOUT);
-		putErrorCodeMap(ErrorType.ISP_MOP_REMOTE_CONNECTION_ERROR);
-		putErrorCodeMap(ErrorType.ISP_MOP_MAPPING_PARSE_ERROR);
-		putErrorCodeMap(ErrorType.ISP_UNKNOWN_ERROR);
-
-		putErrorCodeMap(ErrorType.ISP_HIBERNATE_ERROR);
-		putErrorCodeMap(ErrorType.ISP_SEARCH_ENGINE);
-
-		putErrorCodeMap(ErrorType.ISV_NOT_EXIST);
-		putErrorCodeMap(ErrorType.ISV_MISSING_PARAMETER);
-		putErrorCodeMap(ErrorType.ISV_INVALID_PARAMETER);
-		putErrorCodeMap(ErrorType.ISV_INVALID_PERMISSION);
-		putErrorCodeMap(ErrorType.ISV_PARAMETERS_MISMATCH);
-		putErrorCodeMap(ErrorType.ISV_SERVICE_ERROR);
+//		/********************************错误信息****************************************/
+//		putErrorCodeMap(ErrorType.UPLOAD_FAIL);
+//		putErrorCodeMap(ErrorType.APP_CALL_LIMITED);
+//		putErrorCodeMap(ErrorType.HTTP_ACTION_NOT_ALLOWED);
+//		putErrorCodeMap(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE);
+//		putErrorCodeMap(ErrorType.INSUFFICIENT_ISV_PERMISSIONS);
+//		putErrorCodeMap(ErrorType.INSUFFICIENT_USER_PERMISSIONS);
+//		putErrorCodeMap(ErrorType.INSUFFICIENT_PARTNER_PERMISSIONS);
+//		putErrorCodeMap(ErrorType.MISSING_METHOD);
+//		putErrorCodeMap(ErrorType.INVALID_METHOD);
+//		putErrorCodeMap(ErrorType.INVALID_FORMAT);
+//		putErrorCodeMap(ErrorType.MISSING_SIGNATURE);
+//		putErrorCodeMap(ErrorType.INVALID_SIGNATURE);
+//		putErrorCodeMap(ErrorType.MISSING_SESSION);
+//		putErrorCodeMap(ErrorType.INVALID_SESSION);
+//		putErrorCodeMap(ErrorType.MISSING_APP_KEY);
+//		putErrorCodeMap(ErrorType.INVALID_APP_KEY);
+//		putErrorCodeMap(ErrorType.MISSING_TIMESTAMP);
+//		putErrorCodeMap(ErrorType.INVALID_TIMESTAMP);
+//		putErrorCodeMap(ErrorType.MISSING_VERSION);
+//		putErrorCodeMap(ErrorType.INVALID_VERSION);
+//		putErrorCodeMap(ErrorType.UNSUPPORTED_VERSION);
+//		putErrorCodeMap(ErrorType.INSUFFICIENT_SESSION_PERMISSIONS);
+//		putErrorCodeMap(ErrorType.PARAMETER_ERROR);
+//		putErrorCodeMap(ErrorType.INVALID_ENCODING);
+//
+//		putErrorCodeMap(ErrorType.MISSING_SIGN_METHOD);
+//		putErrorCodeMap(ErrorType.INVALID_SIGN_METHOD);
+//
+//		putErrorCodeMap(ErrorType.INVALID_BUSINESS_PARAMETER);
+//
+//		putErrorCodeMap(ErrorType.BUSSINESS_ERROR);//业务级错误(父级)
+//		
+//        /********************************详细错误信息*************************************/
+//		putErrorCodeMap(ErrorType.ISP_SERVICE_UNAVAILABLE);
+//		putErrorCodeMap(ErrorType.ISP_REMOTE_SERVICE_ERROR);
+//		putErrorCodeMap(ErrorType.ISP_REMOTE_SERVICE_TIMEOUT);
+//		putErrorCodeMap(ErrorType.ISP_REMOTE_CONNECTION_ERROR);
+//		putErrorCodeMap(ErrorType.ISP_NULL_POINTER_EXCEPTION);
+//		putErrorCodeMap(ErrorType.ISP_MOP_PARSE_ERROR);
+//		putErrorCodeMap(ErrorType.ISP_MOP_REMOTE_CONNECTION_TIMEOUT);
+//		putErrorCodeMap(ErrorType.ISP_MOP_REMOTE_CONNECTION_ERROR);
+//		putErrorCodeMap(ErrorType.ISP_MOP_MAPPING_PARSE_ERROR);
+//		putErrorCodeMap(ErrorType.ISP_UNKNOWN_ERROR);
+//
+//		putErrorCodeMap(ErrorType.ISP_HIBERNATE_ERROR);
+//		putErrorCodeMap(ErrorType.ISP_SEARCH_ENGINE);
+//
+//		putErrorCodeMap(ErrorType.ISV_NOT_EXIST);
+//		putErrorCodeMap(ErrorType.ISV_MISSING_PARAMETER);
+//		putErrorCodeMap(ErrorType.ISV_INVALID_PARAMETER);
+//		putErrorCodeMap(ErrorType.ISV_INVALID_PERMISSION);
+//		putErrorCodeMap(ErrorType.ISV_PARAMETERS_MISMATCH);
+//		putErrorCodeMap(ErrorType.ISV_SERVICE_ERROR);
+		
 	}
 	
 	
