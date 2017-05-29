@@ -11,6 +11,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
 import org.springframework.web.servlet.mvc.multiaction.NoSuchRequestHandlingMethodException;
@@ -153,7 +154,7 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 				logger.debug("Exposing Exception as model attribute '" + this.exceptionAttribute + "'");
 			}
 			
-			if (ex instanceof NoSuchRequestHandlingMethodException) {
+			if (ex instanceof UnsatisfiedServletRequestParameterException) {// || ex instanceof NoSuchRequestHandlingMethodException
 				String method=request.getParameter("method");
 				if(method==null||"".equals(method)) {
 					errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.MISSING_METHOD));
