@@ -47,8 +47,10 @@ public class ApiMethodHandlerMapping extends RequestMappingHandlerMapping {
 //	}
 	@Override
 	protected boolean isHandler(Class<?> beanType) {
-		return ((AnnotationUtils.findAnnotation(beanType, Controller.class) != null) ||
-				(AnnotationUtils.findAnnotation(beanType, RequestMapping.class) != null) ||
+//		return ((AnnotationUtils.findAnnotation(beanType, Controller.class) != null) ||
+//				(AnnotationUtils.findAnnotation(beanType, RequestMapping.class) != null) ||
+//				(AnnotationUtils.findAnnotation(beanType, ApiMethod.class) != null) );
+		return ((AnnotationUtils.findAnnotation(beanType, ApiController.class) != null) ||
 				(AnnotationUtils.findAnnotation(beanType, ApiMethod.class) != null) );
 	}
 	
@@ -87,13 +89,13 @@ public class ApiMethodHandlerMapping extends RequestMappingHandlerMapping {
 //		return (requestMapping != null ? createRequestMappingInfo(requestMapping, condition) : null);
 //	}
 	private RequestMappingInfo createRequestMappingInfo(AnnotatedElement element) {//modify by shenjc
-		boolean isRequestMapping = element.isAnnotationPresent(RequestMapping.class);
-		if(isRequestMapping==true) {
-			RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(element, RequestMapping.class);
-			RequestCondition<?> condition = (element instanceof Class<?> ?
-					getCustomTypeCondition((Class<?>) element) : getCustomMethodCondition((Method) element));
-			return (requestMapping != null ? createRequestMappingInfo(requestMapping, condition) : null);
-		}
+//		boolean isRequestMapping = element.isAnnotationPresent(RequestMapping.class);
+//		if(isRequestMapping==true) {
+//			RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(element, RequestMapping.class);
+//			RequestCondition<?> condition = (element instanceof Class<?> ?
+//					getCustomTypeCondition((Class<?>) element) : getCustomMethodCondition((Method) element));
+//			return (requestMapping != null ? createRequestMappingInfo(requestMapping, condition) : null);
+//		}
 		boolean isApiMethod = element.isAnnotationPresent(ApiMethod.class);
 		if(isApiMethod==true) {
 			ApiMethod apiMethod = AnnotatedElementUtils.findMergedAnnotation(element, ApiMethod.class);
@@ -111,21 +113,21 @@ public class ApiMethodHandlerMapping extends RequestMappingHandlerMapping {
 	 * a directly declared annotation, a meta-annotation, or the synthesized
 	 * result of merging annotation attributes within an annotation hierarchy.
 	 */
-	protected RequestMappingInfo createRequestMappingInfo(
-			RequestMapping requestMapping, RequestCondition<?> customCondition) {
-
-		return RequestMappingInfo
-				.paths(resolveEmbeddedValuesInPatterns(requestMapping.path()))
-				.methods(requestMapping.method())
-				.params(requestMapping.params())
-				.headers(requestMapping.headers())
-				.consumes(requestMapping.consumes())
-				.produces(requestMapping.produces())
-				.mappingName(requestMapping.name())
-				.customCondition(customCondition)
-				.options(this.config)
-				.build();
-	}
+//	protected RequestMappingInfo createRequestMappingInfo(
+//			RequestMapping requestMapping, RequestCondition<?> customCondition) {
+//
+//		return RequestMappingInfo
+//				.paths(resolveEmbeddedValuesInPatterns(requestMapping.path()))
+//				.methods(requestMapping.method())
+//				.params(requestMapping.params())
+//				.headers(requestMapping.headers())
+//				.consumes(requestMapping.consumes())
+//				.produces(requestMapping.produces())
+//				.mappingName(requestMapping.name())
+//				.customCondition(customCondition)
+//				.options(this.config)
+//				.build();
+//	}
 	
 	protected RequestMappingInfo createApiMethodInfo(
 			ApiMethod annotation, RequestCondition<?> customCondition, AnnotatedElement element) {//add and modify by shenjc

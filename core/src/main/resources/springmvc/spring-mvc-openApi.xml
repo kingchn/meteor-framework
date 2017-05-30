@@ -11,23 +11,42 @@
 	其中包含mvc:annotation-driven 注意避免重复定义</description>
 	
 	<bean id="apiRequestMappingHandlerMapping" class="cn.meteor.module.core.openApi.annotation.ApiMethodHandlerMapping" lazy-init="false"><!-- 提供支持ApiMethod自定义Mapping注解 -->
-		<property name="order"  value="-2" />
+		<!-- <property name="order"  value="-2" /> --><!-- 不提高排序级别，使默认RequestMapping优先，以后待优化 -->
 		<property name="contentNegotiationManager" ref="contentNegotiationManager" />
 		<property name="useHandler"  value="${core.openApi.apiRequestMappingHandlerMapping.useHandler:false}" /><!-- 是否通过xml的handler映射方法 -->
 	</bean>
 	
-	<bean id="contentNegotiationManager"  class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"><!-- 提供支持通过format控制json或xml响应 -->
-		<property name="favorPathExtension" value="false" />
-		<property name="favorParameter" value="true" />
-		<property name="parameterName" value="format" />
-		<property name="ignoreAcceptHeader" value="${core.openApi.contentNegotiationManager.ignoreAcceptHeader:false}"></property>
-		<property name="useJaf" value="false"/>
-		<property name="defaultContentType" value="application/json" />
+	<!-- 定义参数内容协商策略，扩展为可指定起始url -->
+	<bean id="restParameterContentNegotiationStrategy" class="cn.meteor.module.core.openApi.accept.RestParameterContentNegotiationStrategy">
+		<constructor-arg>
+			<map>
+            	<entry key="json" value="application/json;charset=UTF-8" />
+				<entry key="xml" value="application/xml;charset=UTF-8" />
+				<entry key="html" value="text/html;charset=UTF-8" />
+			</map>
+		</constructor-arg>
+		<property name="parameterName" value="${core.openApi.restParameterContentNegotiationStrategy.parameterName:format}" />
+		<property name="defaultMediaTypeKey" value="${core.openApi.restParameterContentNegotiationStrategy.defaultMediaTypeKey:json}" />
+		<property name="startUrl" value="${core.openApi.restParameterContentNegotiationStrategy.startUrl:/rest}" />
+	</bean>
+	
+	<!-- 空bean，方便defaultContentTypeStrategy可配置 -->
+	<bean id="nullBean"  class="cn.meteor.module.core.spring.NullFactoryBean"  lazy-init="false"></bean>
+	<!-- 提供支持通过format控制json或xml响应 -->
+	<!-- <bean id="contentNegotiationManager"  class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean"> -->
+	<bean id="contentNegotiationManager"  class="cn.meteor.module.core.openApi.accept.RestContentNegotiationManagerFactoryBean">
+		<property name="favorPathExtension" value="${core.openApi.contentNegotiationManager.favorPathExtension:false}" />
+		<property name="favorParameter" value="${core.openApi.contentNegotiationManager.favorParameter:true}" />
+		<property name="parameterName" value="${core.openApi.contentNegotiationManager.parameterName:format}" />
+		<property name="ignoreAcceptHeader" value="${core.openApi.contentNegotiationManager.ignoreAcceptHeader:false}" />
+		<property name="useJaf" value="${core.openApi.contentNegotiationManager.useJaf:false}"/>		
+		<property name="defaultContentType" value="${core.openApi.contentNegotiationManager.defaultContentType:}" />
+        <property name="defaultContentTypeStrategy" ref="${core.openApi.contentNegotiationManager.defaultContentTypeStrategy:nullBean}" /><!--favorParameter、defaultContentType为false时可开启  -->
 		<property name="mediaTypes">
             <map>
 				<entry key="json" value="application/json;charset=UTF-8" />
-				<entry key="xml" value="application/xml; charset=UTF-8" />
-				<entry key="htm" value="text/htm" />
+				<entry key="xml" value="application/xml;charset=UTF-8" />
+				<entry key="html" value="text/html;charset=UTF-8" />
 				<!-- <entry key="file" value="application/octet-stream" />
 				<entry key="image" value="image/*" /> -->
 			</map>
@@ -35,7 +54,8 @@
 	</bean>
 	
 	<!-- <mvc:annotation-driven /> -->
-	<mvc:annotation-driven validator="validator"><!--   content-negotiation-manager="contentNegotiationManager"  -->
+	<!-- 如果没指定content-negotiation-manager熟悉，则会默认实例化名为mvcContentNegotiationManager的bean -->
+	<mvc:annotation-driven validator="validator" content-negotiation-manager="contentNegotiationManager"><!--    -->
 		<!-- <mvc:message-converters register-defaults="true" >
 			<ref bean="mappingJackson2HttpMessageConverter" />
 	        <ref bean="mappingJackson2XmlHttpMessageConverter" />
@@ -55,9 +75,10 @@
   		 
             <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.ModelAndViewMethodReturnValueHandler"></bean> -->
             <!-- <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor"></bean> -->
-            <bean class="cn.meteor.module.core.openApi.handler.RestRequestResponseBodyMethodProcessor"><!-- 提供支持RestResponseBody注解 -->
+            <!-- 提供支持RestResponseBody注解 --><!-- jsonp -->
+            <bean class="cn.meteor.module.core.openApi.handler.RestRequestResponseBodyMethodProcessor">
             	<constructor-arg ref="messageConverters" />
-            	<constructor-arg ref="requestResponseBodyAdvice" /><!-- jsonp -->
+            	<constructor-arg ref="requestResponseBodyAdvice" />
             </bean>
         </mvc:return-value-handlers>
 	</mvc:annotation-driven>	

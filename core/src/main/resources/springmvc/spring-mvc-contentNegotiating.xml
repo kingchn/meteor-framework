@@ -12,13 +12,13 @@
 		<!-- <property name="order" value="#{T(org.springframework.core.Ordered).HIGHEST_PRECEDENCE}" /> -->
 		<property name="contentNegotiationManager" ref="contentNegotiationManager" /><!-- 提供支持通过format控制json或xml响应 -->
 		<property name="defaultViews">
-				<list>				
+				<list>
 				    <bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView">
 						<property name="objectMapper" ref="objectMapperForJson" /><!-- 对于exception如果使用objectMapperForJsonWrapRootValue根会有个HashMap节点 -->
 					</bean>
 				    <bean class="org.springframework.web.servlet.view.xml.MappingJackson2XmlView">
 						<property name="objectMapper" ref="objectMapperForXml" />
-				    </bean>		    
+				    </bean>
 				</list>
 		</property>		
 	</bean>
