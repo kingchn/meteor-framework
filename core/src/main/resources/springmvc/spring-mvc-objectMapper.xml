@@ -16,7 +16,10 @@
 	<bean id="xmlJaxbAnnotationIntrospector" class="com.fasterxml.jackson.dataformat.xml.jaxb.XmlJaxbAnnotationIntrospector" />
 	
 	
-	
+	<util:list id="modules">
+		<bean class="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule" />	
+		<bean class="cn.meteor.module.core.openApi.objectmapper.module.JsonUrlPrefixModule" />
+	</util:list>
 
 
 	<!-- <bean class="cn.meteor.module.core.openApi.RestObjectMapping"></bean> -->
@@ -30,7 +33,8 @@
 				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" /><!--  enable pretty-printing -->
 			</array>
 		</property>
-		<property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/>
+		<!-- <property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/> -->
+		<property name="modules" ref="modules"/>
 		<property name="nullValueSerializer"><!-- 空值转化为空字符串 -->
 			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
 		</property>
@@ -45,7 +49,7 @@
 				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" /><!--  enable pretty-printing -->
 			</array>
 		</property>
-		<property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/>
+		<property name="modules" ref="modules"/>
 		<property name="nullValueSerializer"><!-- 空值转化为空字符串 -->
 			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
 		</property>
