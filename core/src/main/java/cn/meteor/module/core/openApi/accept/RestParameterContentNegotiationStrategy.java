@@ -74,7 +74,12 @@ public class RestParameterContentNegotiationStrategy extends AbstractMappingCont
 		String mediaTypeKey = null;
 		if(request instanceof ServletWebRequest) {
 			ServletWebRequest servletWebRequest = (ServletWebRequest) request;
-			if(servletWebRequest.getRequest().getRequestURI().startsWith(startUrl)) {
+			String contextPath = servletWebRequest.getRequest().getContextPath();
+			String targetStartUrl = startUrl;
+			if(!"/".equals(contextPath)) {
+				targetStartUrl = contextPath + startUrl;
+			}
+			if(servletWebRequest.getRequest().getRequestURI().startsWith(targetStartUrl)) {
 				mediaTypeKey = request.getParameter(getParameterName());
 				if(mediaTypeKey==null) {
 					mediaTypeKey = defaultMediaTypeKey;
