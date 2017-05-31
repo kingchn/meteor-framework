@@ -119,13 +119,19 @@ public class ErrorMsgUtils implements MessageSourceAware {
 		errorCodeMap.put(errorType, code);
 	}
 	
+	protected void putErrorCodeMap(ErrorType errorType, Locale locale) {
+		String code = messageSourceAccessor.getMessage(errorType.toString(), locale);
+		errorCodeMap.put(errorType, code);
+	}
+	
 	public void init() {
 //		String isvMissingParameterCode = messageSourceAccessor.getMessage(ErrorType.ISV_MISSING_PARAMETER.toString());
 //		errorCodeMap.put(ErrorType.ISV_MISSING_PARAMETER, isvMissingParameterCode);
 		
 		//遍历所有错误类型，存到errorCodeMap中
 		for (ErrorType errorType : ErrorType.values()) {
-			putErrorCodeMap(errorType);
+//			putErrorCodeMap(errorType);
+			putErrorCodeMap(errorType, Locale.SIMPLIFIED_CHINESE);
 		}
 		
 //		/********************************错误信息****************************************/
