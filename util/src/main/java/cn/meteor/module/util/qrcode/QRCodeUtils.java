@@ -70,7 +70,16 @@ public class QRCodeUtils {
 		}
 	}
 	
-	public static String encodeQRCodeToBase64String(String text, int width, int height) throws IOException, WriterException {
+	/**
+	 * 生成二维码图片字节数组
+	 * @param text 内容文本
+	 * @param width 宽度
+	 * @param height 高度
+	 * @return 二维码图片字节数组
+	 * @throws IOException
+	 * @throws WriterException
+	 */
+	public static byte[] encodeQRCodeToImageBytes(String text, int width, int height) throws IOException, WriterException {
 //		Charset charset = Charset.forName("UTF-8");
 //		CharsetEncoder encoder = charset.newEncoder();
 //		byte[] bytes = null;
@@ -107,7 +116,7 @@ public class QRCodeUtils {
 		ByteArrayOutputStream out = new ByteArrayOutputStream();  
 		boolean flag = ImageIO.write(bufferedImage, "jpg", out);
         byte[] qrCodeBytes = out.toByteArray();
-		return Base64.encodeBase64String(qrCodeBytes);
+		return qrCodeBytes;
 	}
 	
 //	private static BitMatrix deleteWhite(BitMatrix matrix) {
@@ -125,6 +134,20 @@ public class QRCodeUtils {
 //        }
 //        return resMatrix;
 //    }
+	
+	/**
+	 * 生成二维码图片字节数组后做base64的字符串
+	 * @param text 内容文本
+	 * @param width 宽度
+	 * @param height 高度
+	 * @return 二维码图片字节数组base64的字符串
+	 * @throws IOException
+	 * @throws WriterException
+	 */
+	public static String encodeQRCodeToBase64String(String text, int width, int height) throws IOException, WriterException {
+		byte[] qrCodeBytes = encodeQRCodeToImageBytes(text, width, height);
+		return Base64.encodeBase64String(qrCodeBytes);
+	}
 	
 	public static String decodeQRCodeBase64StringToString(String qrCodeBase64String) throws IOException, NotFoundException {
 		Result result = decodeQRCodeBase64String(qrCodeBase64String);
