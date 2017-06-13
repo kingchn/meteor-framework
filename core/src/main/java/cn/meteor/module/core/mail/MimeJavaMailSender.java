@@ -98,7 +98,8 @@ public class MimeJavaMailSender {
 			helper.setFrom(from, fromName);
 			helper.setSubject(subject);
 			
-			helper.setText(text, true);
+//			helper.setText(text, true);//为true-->发送转义HTML
+			helper.setText(text, false);
 
 			mailSender.send(msg);
 			logger.info("HTML版邮件已发送至:"+ to);
@@ -139,7 +140,8 @@ public class MimeJavaMailSender {
 		helper.setFrom(from, fromName);
 		helper.setSubject(subject);
 		
-		helper.setText(text, true);
+//		helper.setText(text, true);//为true-->发送转义HTML
+		helper.setText(text, false);
 
 		mailSender.send(msg);
 		logger.info("HTML版邮件已发送至:"+ to);
@@ -183,7 +185,8 @@ public class MimeJavaMailSender {
 		helper.setFrom(from, fromName);
 		helper.setSubject(subject);
 		
-		helper.setText(text, true);
+//		helper.setText(text, true);//为true-->发送转义HTML
+		helper.setText(text, false);
 		
 		String attachName = MimeUtility.encodeText(attachment.getName());
 //			helper.addInline(attachName, attachment);
