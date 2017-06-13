@@ -1,6 +1,9 @@
 package cn.meteor.module.core.openApi.request;
 
 import java.io.Serializable;
+import java.util.Map;
+
+import org.springframework.web.bind.annotation.RequestParam;
 
 //@JsonSerialize(include=Inclusion.NON_NULL)
 public class BaseApiRequest implements Serializable {
@@ -21,7 +24,10 @@ public class BaseApiRequest implements Serializable {
 	
 	private String signMethod;
 	
-	
+	/**
+	 * 请求参数map
+	 */
+	private Map<String, Object> allRequestParams;
 
 	public String getMethod() {
 		return method;
@@ -85,5 +91,13 @@ public class BaseApiRequest implements Serializable {
 
 	public void setSignMethod(String signMethod) {
 		this.signMethod = signMethod;
+	}
+
+	public Map<String, Object> getAllRequestParams() {
+		return allRequestParams;
+	}
+
+	public void setAllRequestParams(@RequestParam Map<String, Object> allRequestParams) {
+		this.allRequestParams = allRequestParams;
 	}
 }
