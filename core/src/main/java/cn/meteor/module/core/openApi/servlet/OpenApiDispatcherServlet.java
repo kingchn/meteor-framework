@@ -21,7 +21,7 @@ public class OpenApiDispatcherServlet extends DispatcherServlet {
 	 */
 	protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
 		String contentType = request.getHeader("Content-Type");
-		if ("text/xml".equals(contentType)) {
+		if ("text/xml".equals(contentType)) {//TODO: contentType判断？ 乱码问题
 			ServletRequest requestWrapper = new BodyReaderHttpServletRequestWrapper((HttpServletRequest) request);//保证request.getInputStream()可以重复调用
 			super.doDispatch((HttpServletRequest) requestWrapper, response);
 		} else {
