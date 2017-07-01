@@ -2,6 +2,7 @@ package cn.meteor.module.util.qrcode;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.RoundRectangle2D;
 import java.awt.image.BufferedImage;
@@ -28,6 +29,7 @@ import com.google.zxing.Result;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
+import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 public class QRCodeUtils {
 	
@@ -79,9 +81,13 @@ public class QRCodeUtils {
 	 * @throws WriterException
 	 */
 	public static byte[] encodeQRCodeToImageBytes(String text, int width, int height, String formatName, File logoFile) throws IOException, WriterException {
+//		int left = 10;
+//		int top = 10;
+//		width = width + 2 * left + 2;
+//		height = height + 2 * top + 2;
         Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();  
         // 指定纠错等级,纠错级别（L 7%、M 15%、Q 25%、H 30%）  
-//       hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);//
+       hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);//
        // 内容所使用字符集编码  
        hints.put(EncodeHintType.CHARACTER_SET, "utf-8");//
 //     hints.put(EncodeHintType.MAX_SIZE, 350);//设置图片的最大值  
@@ -100,9 +106,13 @@ public class QRCodeUtils {
                width, //条形码的宽度  
                height, //条形码的高度  
                hints);//生成条形码时的一些配置,此项可选
+       
+       bitMatrix = deleteWhite(bitMatrix);//删除白边
 		
 //		BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
 		 BufferedImage bufferedImage = toBufferedImage(bitMatrix);
+		 
+		 bufferedImage = zoomInImage(bufferedImage, width, height);
 		
 		if(logoFile!=null) {
 			//设置logo图标 
@@ -112,6 +122,42 @@ public class QRCodeUtils {
 		boolean flag = ImageIO.write(bufferedImage, formatName, out);
         byte[] qrCodeBytes = out.toByteArray();
 		return qrCodeBytes;
+	}
+	
+	/**
+	 * 删除白边
+	 * @param matrix
+	 * @return
+	 */
+	private static BitMatrix deleteWhite(BitMatrix matrix) {
+		int[] rec = matrix.getEnclosingRectangle();
+		int resWidth = rec[2] + 1;
+		int resHeight = rec[3] + 1;
+
+		BitMatrix resMatrix = new BitMatrix(resWidth, resHeight);
+		resMatrix.clear();
+		for (int i = 0; i < resWidth; i++) {
+			for (int j = 0; j < resHeight; j++) {
+				if (matrix.get(i + rec[0], j + rec[1]))
+					resMatrix.set(i, j);
+			}
+		}
+		return resMatrix;
+	}
+	
+	/**
+     * 对图片进行放大
+     * @param originalImage 原始图片
+     * @param width
+     * @param height
+     * @return
+     */
+	public static BufferedImage zoomInImage(BufferedImage originalImage, int width, int height) {
+		BufferedImage newImage = new BufferedImage(width, height, originalImage.getType());
+		Graphics g = newImage.getGraphics();
+		g.drawImage(originalImage, 0, 0, width, height, null);
+		g.dispose();
+		return newImage;
 	}
 	
 
