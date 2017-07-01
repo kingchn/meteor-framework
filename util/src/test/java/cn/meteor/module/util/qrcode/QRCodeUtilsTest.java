@@ -1,5 +1,6 @@
 package cn.meteor.module.util.qrcode;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.logging.log4j.LogManager;
@@ -16,12 +17,17 @@ public class QRCodeUtilsTest {
 	@Test
 	public void encodeQRCodeToBase64String() {
 		String text = "01,51,044001600211,98580990,149.60,20170515,80692991863912413132,4BE5";
-		int width=75;
-		int height=75;
+//		int width=75;
+//		int height=75;
 //		int width=100;
 //		int height=100;
+		int width = 430; // 二维码图片宽度 300
+        int height = 430; // 二维码图片高度300
 		try {
-			String qrCodeBase64String = QRCodeUtils.encodeQRCodeToBase64String(text, width, height);
+			File logoFile = new File("E:\\defa01.png");
+//			String qrCodeBase64String = QRCodeUtils2.encodeQRCodeToBase64String(text, width, height, "jpg");
+			String qrCodeBase64String = QRCodeUtils.encodeQRCodeToBase64String(text, width, height, "jpg", logoFile);
+//			byte[] imageBytes = QRCodeUtils.encodeQRCodeToImageBytes(text, width, height, "jpg");
 			System.out.println(qrCodeBase64String);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
