@@ -69,6 +69,7 @@ public class RestJackson2ObjectMapperFactoryBean extends Jackson2ObjectMapperFac
 		if(nullValueSerializer!=null) {//如果空值序列器有设置对象，则通过SerializerProvider来设置空值序列化处理
 			this.getObject().getSerializerProvider().setNullValueSerializer(nullValueSerializer);
 		}
+//		this.getObject().setSerializationInclusion(Include.NON_NULL);
 		if(this.getObject() instanceof XmlMapper) {//Jackson2ObjectMapperBuilder没有xml特性支持，这里新增xml特性支持
 			XmlMapper xmlMapper = (XmlMapper) this.getObject();
 			for (Object feature : this.xmlFeatures.keySet()) {
