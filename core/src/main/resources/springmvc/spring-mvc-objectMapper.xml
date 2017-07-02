@@ -32,12 +32,21 @@
 				<!--<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRAP_ROOT_VALUE" /> --><!-- 启用环绕根元素 -->
 				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" /><!--  enable pretty-printing -->
 			</array>
+		</property>		
+		<!-- <property name="featuresToDisable">
+			<array>
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRITE_NULL_MAP_VALUES" />
+			</array>
+		</property> -->
+		<property name="serializationInclusion">
+			<util:constant static-field="com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL" />
 		</property>
 		<!-- <property name="modulesToInstall" value="cn.meteor.module.core.openApi.objectmapper.module.DataTablesResponseModule"/> -->
 		<property name="modules" ref="modules"/>
-		<property name="nullValueSerializer"><!-- 空值转化为空字符串 -->
+		<!-- 空值转化为空字符串 -->
+		<!-- <property name="nullValueSerializer">
 			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
-		</property>
+		</property> -->
 	</bean>
 	
 	<!-- 启用环绕根元素的objectMapperForJson -->
@@ -49,10 +58,19 @@
 				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT" /><!--  enable pretty-printing -->
 			</array>
 		</property>
-		<property name="modules" ref="modules"/>
-		<property name="nullValueSerializer"><!-- 空值转化为空字符串 -->
-			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
+		<!-- <property name="featuresToDisable">
+			<array>
+				<util:constant static-field="com.fasterxml.jackson.databind.SerializationFeature.WRITE_NULL_MAP_VALUES" />
+			</array>
+		</property> -->
+		<property name="serializationInclusion">
+			<util:constant static-field="com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL" />
 		</property>
+		<property name="modules" ref="modules"/>
+		<!-- 空值转化为空字符串 -->
+		<!-- <property name="nullValueSerializer">
+			 <bean class="cn.meteor.module.core.openApi.objectmapper.jsonserializer.NullJsonSerializer" />
+		</property> -->
 	</bean>
 	
 	<!-- <bean class="cn.meteor.module.core.openApi.RestXmlObjectMapper"></bean> -->
