@@ -14,7 +14,13 @@ import javax.servlet.ServletException;
  * Log4jServletContainerInitializer 
  *
  */
+//@HandlesTypes(WebApplicationInitializer.class)
 public class Log4j2ConfigServletContainerInitializer implements ServletContainerInitializer {
+	
+//	private static final Logger LOGGER = StatusLogger.getLogger();
+//
+//    private ServletContext servletContext;
+//    private Log4jWebLifeCycle initializer;
 
     @Override
     public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
@@ -30,5 +36,17 @@ public class Log4j2ConfigServletContainerInitializer implements ServletContainer
     			ctx.setInitParameter("log4jConfiguration", log4jConfigurationProduction);
     		}
     	}
+    	
+    	
+//        LOGGER.debug("Log4jServletContextListener ensuring that Log4j starts up properly.");
+//
+//        this.initializer = WebLoggerContextUtils.getWebLifeCycle(ctx);
+//        try {
+//            this.initializer.start();
+//            this.initializer.setLoggerContext(); // the application is just now starting to start up
+//        } catch (final IllegalStateException e) {
+//            throw new IllegalStateException("Failed to initialize Log4j properly.", e);
+//        }
+
     }
 }
