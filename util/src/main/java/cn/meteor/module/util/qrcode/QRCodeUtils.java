@@ -292,6 +292,10 @@ public class QRCodeUtils {
 		BinaryBitmap bitmap = new BinaryBitmap(new HybridBinarizer(source));
 		Hashtable<DecodeHintType, Object> hints = new Hashtable<DecodeHintType, Object>();
 		hints.put(DecodeHintType.CHARACTER_SET, "UTF-8");
+		//优化精度
+//		hints.put(DecodeHintType.TRY_HARDER, Boolean.TRUE);
+		//复杂模式，开启PURE_BARCODE模式
+		hints.put(DecodeHintType.PURE_BARCODE, Boolean.TRUE);
 		Result result = new MultiFormatReader().decode(bitmap, hints);
 //		String rtn = result.getText();
 //		System.out.println(rtn);
