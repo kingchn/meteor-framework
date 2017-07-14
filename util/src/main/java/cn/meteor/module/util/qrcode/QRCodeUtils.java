@@ -30,8 +30,21 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
+import com.google.zxing.qrcode.encoder.ByteMatrix;
 
 public class QRCodeUtils {
+	
+	/**
+	 * 根据版本号取得码元数
+	 * @param version
+	 * @return
+	 */
+	public static int getVersionUnitSize(int version) {
+//		版本信息：即二维码的规格，QR码符号共有40种规格的矩阵（一般为黑白色），从21x21（版本1），到177x177（版本40），每一版本符号比前一版本每边增加4个模块。
+//		177 ＝ 21+(40-1)*4 ＝ 21 ＋156
+		int unitSize=21+ (version-1)*4;
+		return unitSize;
+	}
 	
 	
 //	public static void encode111(String content, String filePath) {//TODO: 优化及测试
@@ -76,23 +89,31 @@ public class QRCodeUtils {
 	 * @param height 高度
 	 * @param formatName 图片文件格式
 	 * @param logoFile logo文件
+	 * @param errorCorrectionLevel 纠错级别
+	 * @param qrVersion qr版本
 	 * @return 二维码图片字节数组
 	 * @throws IOException
 	 * @throws WriterException
 	 */
-	public static byte[] encodeQRCodeToImageBytes(String text, int width, int height, String formatName, File logoFile) throws IOException, WriterException {
+	public static byte[] encodeQRCodeToImageBytes(String text, int width, int height, String formatName, File logoFile, ErrorCorrectionLevel errorCorrectionLevel, Integer qrVersion) throws IOException, WriterException {
 //		int left = 10;
 //		int top = 10;
 //		width = width + 2 * left + 2;
 //		height = height + 2 * top + 2;
         Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();  
-        // 指定纠错等级,纠错级别（L 7%、M 15%、Q 25%、H 30%）  
-       hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);//
+        // 指定纠错等级,纠错级别（L 7%、M 15%、Q 25%、H 30%）
+        if(errorCorrectionLevel==null) {
+        	errorCorrectionLevel = ErrorCorrectionLevel.M;
+        }
+       hints.put(EncodeHintType.ERROR_CORRECTION, errorCorrectionLevel);//
        // 内容所使用字符集编码  
        hints.put(EncodeHintType.CHARACTER_SET, "utf-8");//
 //     hints.put(EncodeHintType.MAX_SIZE, 350);//设置图片的最大值  
 //     hints.put(EncodeHintType.MIN_SIZE, 100);//设置图片的最小值  
        hints.put(EncodeHintType.MARGIN, 1);//设置二维码边的空度，非负数
+       if(qrVersion!=null) {
+    	   hints.put(EncodeHintType.QR_VERSION, qrVersion);
+       }
        
 //       com.google.zxing.Writer writer = new QRCodeWriter();
        com.google.zxing.Writer writer = new MultiFormatWriter();
@@ -122,6 +143,38 @@ public class QRCodeUtils {
 		boolean flag = ImageIO.write(bufferedImage, formatName, out);
         byte[] qrCodeBytes = out.toByteArray();
 		return qrCodeBytes;
+	}
+	
+	/**
+	 * 生成二维码图片字节数组
+	 * @param text 内容文本
+	 * @param width 宽度
+	 * @param height 高度
+	 * @param formatName 图片文件格式
+	 * @param errorCorrectionLevel 纠错级别
+	 * @param qrVersion qr版本
+	 * @return 二维码图片字节数组
+	 * @throws IOException
+	 * @throws WriterException
+	 */
+	public static byte[] encodeQRCodeToImageBytes(String text, int width, int height, String formatName, ErrorCorrectionLevel errorCorrectionLevel, Integer qrVersion) throws IOException, WriterException {
+		return encodeQRCodeToImageBytes(text, width, height, formatName, null, errorCorrectionLevel, qrVersion);
+	}
+	
+	/**
+	 * 生成二维码图片字节数组
+	 * @param text 内容文本
+	 * @param width 宽度
+	 * @param height 高度
+	 * @param formatName 图片文件格式
+	 * @param logoFile logo文件
+	 * @return 二维码图片字节数组
+	 * @throws IOException
+	 * @throws WriterException
+	 */
+	public static byte[] encodeQRCodeToImageBytes(String text, int width, int height, String formatName, File logoFile) throws IOException, WriterException {
+//		 指定纠错等级,纠错级别（L 7%、M 15%、Q 25%、H 30%） 设置默认为M
+		return encodeQRCodeToImageBytes(text, width, height, formatName, logoFile, ErrorCorrectionLevel.M, null);
 	}
 	
 	/**
@@ -214,6 +267,18 @@ public class QRCodeUtils {
 			for (int y = 0; y < height; y++) {
 				image.setRGB(x, y, (matrix.get(x, y) ? BLACK : WHITE));
 				// image.setRGB(x, y, (matrix.get(x, y) ? Color.YELLOW.getRGB() : Color.CYAN.getRGB()));
+			}
+		}
+		return image;
+	}
+	
+	public static BufferedImage toBufferedImage(ByteMatrix matrix) {
+		int width = matrix.getWidth();
+		int height = matrix.getHeight();
+		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		for (int x = 0; x < width; x++) {
+			for (int y = 0; y < height; y++) {
+				image.setRGB(x, y, matrix.get(x, y) == 0 ? BLACK : WHITE);
 			}
 		}
 		return image;
