@@ -56,7 +56,7 @@ public class CapacityMap {
 		int version =1;
 //		for (Entry<Integer, Integer> entry : CapacityMap.binaryMMap.entrySet()) {
 		for (Entry<Integer, Integer> entry : map.entrySet()) {
-		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
+//		    System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
 		    if(length>entry.getValue()) {//如果内容长度大于当前版本的长度，则下一个
 		    	continue;
 		    } else {
