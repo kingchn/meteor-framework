@@ -11,7 +11,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class ResponseLoggerFilter implements Filter {
+	
+	private  static final Logger logger = LogManager.getLogger(ResponseLoggerFilter.class);
 
     @Override
     public void init(FilterConfig config) throws ServletException {
@@ -37,9 +42,18 @@ public class ResponseLoggerFilter implements Filter {
 				HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 				String requestURI = httpServletRequest.getRequestURI();
 				String requestQueryString = httpServletRequest.getQueryString();
-				String content = "requestURI:" + requestURI + " requestQueryString:" + requestQueryString + "\n";
-				content = content + "response:" + new String(copy, response.getCharacterEncoding());
-				System.out.println(content); // Do your logging job here. This is just a basic example.
+				String msg = "\nrequestURI:" + requestURI + " requestQueryString:" + requestQueryString + "\n";
+				String contentType = response.getContentType();
+				if(contentType!=null) {
+					if(contentType.contains("application/json") || contentType.contains("application/javascript") 
+							|| contentType.contains("application/xml") || contentType.contains("text/xml")) {
+						msg = msg + "response:" + new String(copy, response.getCharacterEncoding()) + "\n";
+					}
+					msg = msg + "contentType:" + contentType;
+				} else {
+					msg = msg + "contentType:";
+				}				
+				logger.debug(msg);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
