@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
  * SpringServletContainerInitializer
  * Log4jServletContainerInitializer 
  *
+ * https://logging.apache.org/log4j/2.x/manual/webapp.html
  */
 //@HandlesTypes(WebApplicationInitializer.class)
 public class Log4j2ConfigServletContainerInitializer implements ServletContainerInitializer {
