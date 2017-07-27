@@ -8,13 +8,13 @@ import org.junit.Test;
 
 public class MD5UtilsTest {
 
-	private  static final Logger logger = LogManager.getLogger(MD5UtilsTest.class);
+//	private final static Logger logger = LoggerFactory.getLogger(MD5UtilsTest.class);
+	private static final Logger logger = LogManager.getLogger(MD5UtilsTest.class);
 
 	@Test
 	public void testMd5Digest() {
 		try {
-//			String src = " MERCHANTID=123456789&ORDERSEQ=20060314000001&ORDERDATE=20060314&ORDERAMOUNT=10000";
-			String src = "111111";
+			String src = " MERCHANTID=123456789&ORDERSEQ=20060314000001&ORDERDATE=20060314&ORDERAMOUNT=10000";
 			String result = MD5Utils.md5Digest(src);			
 			logger.info(result);
 //			String result2=DigestUtils.md5Hex(src);
