@@ -182,34 +182,36 @@ public class ExcelUtils {
 //		SimpleDateFormat sdf = new SimpleDateFormat("yyy-MM-dd"); // 日期格式化
 //		DecimalFormat df2 = new DecimalFormat("0.00"); // 格式化数字
 
-		switch (cell.getCellTypeEnum()) {
-		case STRING:
-			value = cell.getRichStringCellValue().getString();
-			break;
-		case NUMERIC:
-//			if ("General".equals(cell.getCellStyle().getDataFormatString())) {
-//				value = df.format(cell.getNumericCellValue());
-//			} else if ("m/d/yy".equals(cell.getCellStyle().getDataFormatString()) || "yyyy-mm-dd".equals(cell.getCellStyle().getDataFormatString())) {
-//				value = sdf.format(cell.getDateCellValue());
-//			} else {
-//				value = df2.format(cell.getNumericCellValue());
-//			}
-			String dataFormatString = cell.getCellStyle().getDataFormatString();
-//			if("yyyy\\-mm\\-dd".equals(dataFormatString) || "yyyy\\-mm\\-dd\\ h:mm:ss".equals(dataFormatString) || "m/d/yy".equals(dataFormatString)) {
-			if(dataFormatString.contains("yy") || dataFormatString.contains("m") || dataFormatString.contains("d") || dataFormatString.contains("h") || dataFormatString.contains("ss")) {
-				value = cell.getDateCellValue();
-			} else {
-				value = cell.getNumericCellValue();
+		if(cell!=null) {
+			switch (cell.getCellTypeEnum()) {
+			case STRING:
+				value = cell.getRichStringCellValue().getString();
+				break;
+			case NUMERIC:
+	//			if ("General".equals(cell.getCellStyle().getDataFormatString())) {
+	//				value = df.format(cell.getNumericCellValue());
+	//			} else if ("m/d/yy".equals(cell.getCellStyle().getDataFormatString()) || "yyyy-mm-dd".equals(cell.getCellStyle().getDataFormatString())) {
+	//				value = sdf.format(cell.getDateCellValue());
+	//			} else {
+	//				value = df2.format(cell.getNumericCellValue());
+	//			}
+				String dataFormatString = cell.getCellStyle().getDataFormatString();
+	//			if("yyyy\\-mm\\-dd".equals(dataFormatString) || "yyyy\\-mm\\-dd\\ h:mm:ss".equals(dataFormatString) || "m/d/yy".equals(dataFormatString)) {
+				if(dataFormatString.contains("yy") || dataFormatString.contains("m") || dataFormatString.contains("d") || dataFormatString.contains("h") || dataFormatString.contains("ss")) {
+					value = cell.getDateCellValue();
+				} else {
+					value = cell.getNumericCellValue();
+				}
+				break;
+			case BOOLEAN:
+				value = cell.getBooleanCellValue();
+				break;
+			case BLANK:
+				value = "";
+				break;
+			default:
+				break;
 			}
-			break;
-		case BOOLEAN:
-			value = cell.getBooleanCellValue();
-			break;
-		case BLANK:
-			value = "";
-			break;
-		default:
-			break;
 		}
 		return value;
 	}
