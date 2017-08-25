@@ -181,13 +181,14 @@ public class ApiMethodHandlerMapping extends RequestMappingHandlerMapping {
 	protected RequestMappingInfo getMatchingMapping(RequestMappingInfo info, HttpServletRequest request) {
 		if (useHandler) {
 			String contentType = request.getHeader("Content-Type");
-			if ("text/xml".equals(contentType)) {
+			if (contentType!=null && contentType.contains("text/xml")) {
 				try {
 					SAXReader sax = new SAXReader();
 					Document document = sax.read(request.getInputStream());// reader为定义的一个字符串，可以转换为xml
 					Element root = document.getRootElement();//
 					String handler = root.element("head").element("service").element("handler").getTextTrim();
-					request.setAttribute("handler", handler);
+					String action = root.element("head").element("service").element("action").getTextTrim();
+					request.setAttribute("handler", handler + ":" + action);
 
 				} catch (IOException e) {
 					e.printStackTrace();

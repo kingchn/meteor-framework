@@ -22,8 +22,8 @@ public class HandlersRequestCondition implements RequestCondition<HandlersReques
 		this(Arrays.asList(handlers));
 	}
 	
-	private HandlersRequestCondition(Collection<String> roles) {
-		this.handlers = Collections.unmodifiableSet(new HashSet<String>(roles));
+	private HandlersRequestCondition(Collection<String> handlers) {
+		this.handlers = Collections.unmodifiableSet(new HashSet<String>(handlers));
 	}
 
 	@Override
