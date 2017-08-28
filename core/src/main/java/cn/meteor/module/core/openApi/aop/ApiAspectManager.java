@@ -118,16 +118,23 @@ public class ApiAspectManager {
         Class targetClass = Class.forName(targetName);
         Method[] methods = targetClass.getMethods();
         String[] values = null;
+        String anMethodName = "";
          for (Method method : methods) {
              if (method.getName().equals(methodName)) {
                 Class[] clazzs = method.getParameterTypes();
                  if (clazzs.length == arguments.length) {
                 	 values = method.getAnnotation(ApiMethod.class).value();
+                	 if(values.length==0) {
+                		 values = method.getAnnotation(ApiMethod.class).handler();
+                	 }
+                	 if(values.length>0) {
+                		 anMethodName = values[0];
+                	 }
                      break;
                 }
             }
         }
-         return values[0];
+         return anMethodName;
     }
     
     
