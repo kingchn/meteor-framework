@@ -6,6 +6,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
@@ -102,7 +103,10 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 			errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE));
 			errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE, locale));
 			errorResponse.setDetailCode(ErrorMsgUtils.getErrorCode(ErrorType.ISP_UNKNOWN_ERROR));
-			errorResponse.setDetailMsg(ErrorMsgUtils.getErrorMsg(ErrorType.ISP_UNKNOWN_ERROR, locale));
+//			errorResponse.setDetailMsg(ErrorMsgUtils.getErrorMsg(ErrorType.ISP_UNKNOWN_ERROR, locale));
+			String errorMsg = ErrorMsgUtils.getErrorMsg(ErrorType.ISP_UNKNOWN_ERROR, locale);
+			String stackTrace=ExceptionUtils.getFullStackTrace(ex);
+			errorResponse.setDetailMsg(errorMsg + ":" + stackTrace);
 		}
 		return errorResponse;
 	}
