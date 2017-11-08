@@ -1,6 +1,6 @@
 package cn.meteor.module.core.openApi.exception;
 
-public class IsvException extends Exception {
+public class IsvException extends RuntimeException {
 	
 	/**
 	 * 
