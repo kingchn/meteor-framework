@@ -81,7 +81,7 @@ public class RSAUtils {
      * @param base64StringPublicKey 公钥数据字符串 
      * @throws Exception 加载公钥时产生的异常 
      */  
-    public static RSAPublicKey getRSAPublicKeyBybase64StringKey(String base64StringPublicKey) throws Exception {  
+    public static RSAPublicKey getRSAPublicKeyByBase64StringKey(String base64StringPublicKey) throws Exception {  
         try {  
 //            BASE64Decoder base64Decoder= new BASE64Decoder();  
 //            byte[] keyBytes= base64Decoder.decodeBuffer(publicKeyString);
@@ -104,7 +104,7 @@ public class RSAUtils {
      * @return
      * @throws Exception
      */
-    public static RSAPrivateKey getRSAPrivateKeyBybase64StringKey(String base64StringPrivateKey) throws Exception{
+    public static RSAPrivateKey getRSAPrivateKeyByBase64StringKey(String base64StringPrivateKey) throws Exception{
         try {  
 //            BASE64Decoder base64Decoder= new BASE64Decoder();  
 //            byte[] keyBytes= base64Decoder.decodeBuffer(base64StringPrivateKey);
@@ -183,7 +183,7 @@ public class RSAUtils {
      * @throws Exception
      */
     public static byte[] encryptWithBase64StringPublicKey(String base64StringPublicKey, byte[] plainTextBytes) throws Exception{
-    	RSAPublicKey rsaPublicKey = getRSAPublicKeyBybase64StringKey(base64StringPublicKey);//由字符串转化得到的公钥对象
+    	RSAPublicKey rsaPublicKey = getRSAPublicKeyByBase64StringKey(base64StringPublicKey);//由字符串转化得到的公钥对象
     	return encrypt(rsaPublicKey, plainTextBytes);
     }
     
@@ -248,10 +248,144 @@ public class RSAUtils {
      * @throws Exception
      */
     public static byte[] decryptWithBase64StringPrivateKey(String base64StringPrivateKey, byte[] cipherBytes) throws Exception{
-    	RSAPrivateKey rsaPrivateKey = getRSAPrivateKeyBybase64StringKey(base64StringPrivateKey);
+    	RSAPrivateKey rsaPrivateKey = getRSAPrivateKeyByBase64StringKey(base64StringPrivateKey);
     	return decrypt(rsaPrivateKey, cipherBytes);
     }
     
+    
+    /*=========================================================*/
+ 
+    /** 
+     * 加密过程 
+     * @param rsaPrivateKey 私钥
+     * @param plainTextBytes 明文数据 
+     * @return 
+     * @throws Exception 加密过程中的异常信息 
+     */  
+    public static byte[] encrypt(RSAPrivateKey rsaPrivateKey, byte[] plainTextBytes) throws Exception{
+        if(rsaPrivateKey== null){  
+            throw new Exception("加密私钥为空, 请设置");  
+        }  
+        Cipher cipher= null;  
+        try {  
+//            cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());
+//        	cipher= Cipher.getInstance("RSA");//不使用Provider
+        	cipher= Cipher.getInstance("RSA/ECB/PKCS1Padding");//不使用Provider
+            cipher.init(Cipher.ENCRYPT_MODE, rsaPrivateKey);  
+//            byte[] output= cipher.doFinal(plainTextBytes);  
+//            return output;
+            int inputLen = plainTextBytes.length;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int offSet = 0;
+            byte[] cache;
+            int i = 0;
+            // 对数据分段加密
+            while (inputLen - offSet > 0) {
+                if (inputLen - offSet > MAX_ENCRYPT_BLOCK) {
+                    cache = cipher.doFinal(plainTextBytes, offSet, MAX_ENCRYPT_BLOCK);
+                } else {
+                    cache = cipher.doFinal(plainTextBytes, offSet, inputLen - offSet);
+                }
+                out.write(cache, 0, cache.length);
+                i++;
+                offSet = i * MAX_ENCRYPT_BLOCK;
+            }
+            byte[] encryptedData = out.toByteArray();
+            out.close();
+            return encryptedData;
+        } catch (NoSuchAlgorithmException e) {  
+            throw new Exception("无此加密算法"+ e.getMessage());  
+        } catch (NoSuchPaddingException e) {  
+            e.printStackTrace();  
+            return null;  
+        }catch (InvalidKeyException e) {  
+            throw new Exception("加密公钥非法,请检查"+ e.getMessage());  
+        } catch (IllegalBlockSizeException e) {  
+            throw new Exception("明文长度非法"+ e.getMessage());  
+        } catch (BadPaddingException e) {  
+            throw new Exception("明文数据已损坏"+ e.getMessage());  
+        }  
+    }
+    
+    /**
+     * 使用Base64字符串私钥进行加密
+     * @param base64StringPrivateKey Base64字符串私钥
+     * @param plainTextBytes
+     * @return
+     * @throws Exception
+     */
+    public static byte[] encryptWithBase64StringPrivateKey(String base64StringPrivateKey, byte[] plainTextBytes) throws Exception{
+    	RSAPrivateKey rsaPrivateKey = getRSAPrivateKeyByBase64StringKey(base64StringPrivateKey);//由字符串转化得到的公钥对象
+    	return encrypt(rsaPrivateKey, plainTextBytes);
+    }
+    
+    /** 
+     * 解密过程 
+     * @param rsaPublicKey 公钥 
+     * @param cipherBytes 密文数据 
+     * @return 明文 
+     * @throws Exception 解密过程中的异常信息 
+     */  
+    public static byte[] decrypt(RSAPublicKey rsaPublicKey, byte[] cipherBytes) throws Exception{  
+        if (rsaPublicKey== null){  
+            throw new Exception("解密公钥为空, 请设置");  
+        }  
+        Cipher cipher= null;  
+        try {  
+//            cipher= Cipher.getInstance("RSA", new BouncyCastleProvider());
+//            cipher= Cipher.getInstance("RSA");//不使用Provider
+        	cipher= Cipher.getInstance("RSA/ECB/PKCS1Padding");//不使用Provider
+            cipher.init(Cipher.DECRYPT_MODE, rsaPublicKey);  
+//            byte[] output= cipher.doFinal(cipherBytes);  
+//            return output;  
+            int inputLen = cipherBytes.length;
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            int offSet = 0;
+            byte[] cache;
+            int i = 0;
+            // 对数据分段解密
+            while (inputLen - offSet > 0) {
+                if (inputLen - offSet > MAX_DECRYPT_BLOCK) {
+                    cache = cipher.doFinal(cipherBytes, offSet, MAX_DECRYPT_BLOCK);
+                } else {
+                    cache = cipher.doFinal(cipherBytes, offSet, inputLen - offSet);
+                }
+                out.write(cache, 0, cache.length);
+                i++;
+                offSet = i * MAX_DECRYPT_BLOCK;
+            }
+            byte[] decryptedData = out.toByteArray();
+            out.close();
+            return decryptedData;
+        } catch (NoSuchAlgorithmException e) {  
+            throw new Exception("无此解密算法"+ e.getMessage());  
+        } catch (NoSuchPaddingException e) {  
+            e.printStackTrace();  
+            return null;  
+        }catch (InvalidKeyException e) {  
+            throw new Exception("解密私钥非法,请检查"+ e.getMessage());  
+        } catch (IllegalBlockSizeException e) {  
+            throw new Exception("密文长度非法"+ e.getMessage());  
+        } catch (BadPaddingException e) {  
+            throw new Exception("密文数据已损坏"+ e.getMessage());  
+        }         
+    }
+    
+    /**
+     * 使用Base64字符串公钥进行解密
+     * @param base64StringPublicKey Base64字符串公钥
+     * @param cipherBytes
+     * @return
+     * @throws Exception
+     */
+    public static byte[] decryptWithBase64StringPublicKey(String base64StringPublicKey, byte[] cipherBytes) throws Exception{
+    	RSAPublicKey rsaPublicKey = getRSAPublicKeyByBase64StringKey(base64StringPublicKey);
+    	return decrypt(rsaPublicKey, cipherBytes);
+    }
+    
+    
+    
+    /*=========================================================*/
     
     /*
 	 * 16进制数字字符集
