@@ -9,6 +9,7 @@ import javax.mail.internet.MimeUtility;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.core.io.InputStreamSource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -192,6 +193,42 @@ public class MimeJavaMailSender {
 //			helper.addInline(attachName, attachment);
 		
 		helper.addAttachment(attachment.getName(), attachment);
+
+		mailSender.send(msg);
+		logger.info("HTML版邮件已发送至:"+ to);
+	}
+	
+	/**
+	 * 发送带附件邮件
+	 * @param from 发件人邮箱
+	 * @param fromName 发件人名称
+	 * @param to 收件人
+	 * @param subject 标题
+	 * @param text 内容
+	 * @param encoding 邮件编码
+	 * @param inputStreamSource 附件输入流
+	 * @return 发送结果 1:成功  2:构造邮件失败MessagingException 3:收件地址无效 4:其他错误
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, InputStreamSource inputStreamSource, String attachmentName) throws MessagingException, UnsupportedEncodingException {
+		if(encoding==null||"".equals(encoding)) {
+			encoding = DEFAULT_ENCODING;
+		}
+		MimeMessage msg = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(msg, true, encoding);
+
+		helper.setTo(to);
+		helper.setFrom(from, fromName);
+		helper.setSubject(subject);
+		
+//		helper.setText(text, true);//为true-->发送转义HTML
+		helper.setText(text, false);
+		
+		String attachName = MimeUtility.encodeText(attachmentName);
+//			helper.addInline(attachName, attachment);
+		
+		helper.addAttachment(attachmentName, inputStreamSource);
 
 		mailSender.send(msg);
 		logger.info("HTML版邮件已发送至:"+ to);
