@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+默认配置，避免最开始提示如下错误，并没有其他作用
+ERROR StatusLogger No log4j2 configuration file found. 
+Using default configuration: logging only errors to the console. 
+Set system property 'org.apache.logging.log4j.simplelog.StatusLogger.level' to TRACE to show Log4j2 internal initialization logging.
+相关代码工厂类：org.apache.logging.log4j.core.impl.Log4jContextFactory
+ -Dorg.apache.logging.log4j.simplelog.StatusLogger.level=TRACE
+ -->
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS}=start default= [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+    <Root level="debug">
+      <AppenderRef ref="console"/>
+    </Root>
+  </Loggers>
+</Configuration>
