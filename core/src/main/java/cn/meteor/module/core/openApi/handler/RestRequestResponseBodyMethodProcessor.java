@@ -20,8 +20,6 @@ package cn.meteor.module.core.openApi.handler;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,14 +27,10 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.core.Conventions;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.http.server.ServletServerHttpRequest;
-import org.springframework.http.server.ServletServerHttpResponse;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -46,14 +40,9 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
-import org.springframework.web.method.annotation.ModelFactory;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor;
 
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-import cn.meteor.module.core.openApi.DataTablesOutput;
 import cn.meteor.module.core.openApi.annotation.RestRequestBody;
 import cn.meteor.module.core.openApi.annotation.RestResponseBody;
 
@@ -151,7 +140,11 @@ public class RestRequestResponseBodyMethodProcessor extends RequestResponseBodyM
 
 		Object arg = readWithMessageConverters(inputMessage, methodParam, paramType);
 		if (arg == null) {
-			if (methodParam.getParameterAnnotation(RequestBody.class).required()) {
+//			if (methodParam.getParameterAnnotation(RequestBody.class).required()) {
+//				throw new HttpMessageNotReadableException("Required request body is missing: " +
+//						methodParam.getMethod().toGenericString());
+//			}
+			if (methodParam.getParameterAnnotation(RestRequestBody.class).required()) {
 				throw new HttpMessageNotReadableException("Required request body is missing: " +
 						methodParam.getMethod().toGenericString());
 			}
