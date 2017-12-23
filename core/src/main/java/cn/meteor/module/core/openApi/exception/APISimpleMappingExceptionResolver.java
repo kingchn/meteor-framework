@@ -149,7 +149,7 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 	}
 	
 	protected ErrorResponse getErrorResponseAnalysisByKnownException(String viewName, Exception ex, HttpServletRequest request, Locale locale) {
-		logger.error(ex.toString(),ex);	
+		logger.error("getErrorResponseAnalysisByKnownException：" + ex.toString(),ex);
 		
 		ErrorResponse errorResponse = new ErrorResponse();		
 		
@@ -184,8 +184,7 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 			} else if(ex instanceof IllegalStateException) {
 				errorResponse.setCode(ErrorMsgUtils.getErrorCode(ErrorType.PARAMETER_ERROR));
 				errorResponse.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.PARAMETER_ERROR, locale));
-				IllegalStateException illegalStateException = (IllegalStateException) ex;
-				int i;
+//				IllegalStateException illegalStateException = (IllegalStateException) ex;
 				//设置详细错误信息
 				//TODO: 设置详细错误信息
 //				List<FieldError> fieldErrors =  ((IllegalStateException) ex).getBindingResult().getFieldErrors();

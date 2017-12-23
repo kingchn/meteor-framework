@@ -6,13 +6,13 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -25,6 +25,8 @@ import cn.meteor.module.core.openApi.response.ErrorType;
 //@Aspect  
 //@Component
 public class ApiAspectManager {
+	
+	private static final Logger logger = LogManager.getLogger(ApiAspectManager.class);
 
 	// Controller层切点
 	@Pointcut("@annotation(cn.meteor.module.core.openApi.annotation.ApiMethod)")
@@ -167,17 +169,26 @@ public class ApiAspectManager {
 			String detailCode = MessageFormat.format(ErrorMsgUtils.getErrorCode(ErrorType.ISV_NOT_EXIST), new Object[] { dataNotFoundErrorMsg, annotationMethodName });
 			String detailMsg = ErrorMsgUtils.getErrorMsg(ErrorType.ISV_NOT_EXIST, new Object[] { dataNotFoundErrorMsg, annotationMethodName }, locale);
 
-			IsvException isvException = new IsvException(code, msg, detailCode, detailMsg);
+			IsvException isvException = new IsvException(code, msg, detailCode, detailMsg, emptyResultDataAccessException.getRootCause());
 			throw isvException;
-		} catch (DataIntegrityViolationException dataIntegrityViolationException) {//IntegrityConstraintViolation 违反-完整性约束	
+		} catch (DataIntegrityViolationException dataIntegrityViolationException) {//IntegrityConstraintViolation 违反-完整性约束
 			//这里我们预期前面已做了入参验证，剩下的问题都是后端处理问题，故这种异常我们归类为IspException
-			String annotationMethodName =  getApiMethodValues(pjp.getTarget().getClass().getName(),pjp.getSignature().getName(), pjp.getArgs());
+//			logger.error("arroundApiController捕捉到DataIntegrityViolationException错误: ", dataIntegrityViolationException);
+			String annotationMethodName = null;
+			try {
+				annotationMethodName = getApiMethodValues(pjp.getTarget().getClass().getName(),pjp.getSignature().getName(), pjp.getArgs());
+			} catch (Exception e) {
+				logger.error("arroundApiController捕捉调用getApiMethodValues中的错误: ", e);
+			}
 			String rootCauseMessage = dataIntegrityViolationException.getRootCause().getMessage();
-			IspException ispException = new IspException();
-			ispException.setCode(ErrorMsgUtils.getErrorCode(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE));
-			ispException.setMsg(ErrorMsgUtils.getErrorMsg(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE, locale));
-			ispException.setDetailCode(ErrorMsgUtils.getErrorCode(ErrorType.ISP_SERVICE_UNAVAILABLE).replace("***", annotationMethodName));
-			ispException.setDetailMsg(rootCauseMessage);
+			String code = ErrorMsgUtils.getErrorCode(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE);
+			String msg = ErrorMsgUtils.getErrorMsg(ErrorType.SERVICE_CURRENTLY_UNAVAILABLE, locale);
+			String detailCode = ErrorMsgUtils.getErrorCode(ErrorType.ISP_SERVICE_UNAVAILABLE).replace("***", annotationMethodName);
+			String detailMsg = rootCauseMessage;
+			IspException ispException = new IspException(code, msg, detailCode, detailMsg, dataIntegrityViolationException.getRootCause());
+//			logger.error("19===>" + ispException.getCode() + "|" +  ispException.getMsg() 
+//			+ "|" + ispException.getDetailCode() + "|" + ispException.getDetailMsg() 
+//			+ "|" + ispException.getMessage());
 			throw ispException;
 		}
 		

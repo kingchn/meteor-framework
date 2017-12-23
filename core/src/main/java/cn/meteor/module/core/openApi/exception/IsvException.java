@@ -65,4 +65,12 @@ public class IsvException extends RuntimeException {
 		this.detailCode=detailCode;
 		this.detailMsg = detailMsg;   
     }
+	
+	public IsvException(String code, String msg, String detailCode, String detailMsg, Throwable cause) {
+		super(detailMsg, cause);
+		this.code = code;
+		this.msg = msg;
+		this.detailCode=detailCode;
+		this.detailMsg = detailMsg;   
+    }
 }

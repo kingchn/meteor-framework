@@ -64,4 +64,12 @@ public class IspException extends RuntimeException {
 		this.detailMsg = detailMsg;   
     }
 	
+	public IspException(String code, String msg, String detailCode, String detailMsg, Throwable cause) {
+		super(detailMsg, cause);
+		this.code = code;
+		this.msg = msg;
+		this.detailCode=detailCode;
+		this.detailMsg = detailMsg;   
+    }
+	
 }
