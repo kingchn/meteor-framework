@@ -1,0 +1,168 @@
+package cn.meteor.module.core.shiro.cache.eh_redis;
+
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.shiro.cache.CacheException;
+import org.springframework.cache.support.SimpleValueWrapper;
+import org.springframework.data.redis.core.RedisTemplate;
+
+import net.sf.ehcache.Element;
+
+public class EhRedisCache_spring implements org.springframework.cache.Cache {
+	
+	private static final Logger logger = LogManager.getLogger(EhRedisCache_spring.class);
+	
+	private net.sf.ehcache.Cache ehCache;
+	
+	public net.sf.ehcache.Cache getEhCache() {
+        return ehCache;
+    }
+
+    public void setEhCache(net.sf.ehcache.Cache ehCache) {
+        this.ehCache = ehCache;
+    }
+	
+	/**
+     * Backing instance.
+     */
+//    private final Map<K, V> map;
+    private RedisTemplate<String, Object> redisTemplate;
+
+    public RedisTemplate<String, Object> getRedisTemplate() {
+		return redisTemplate;
+	}
+
+	public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+		this.redisTemplate = redisTemplate;
+	}
+
+	/**
+     * The name of this cache.
+     */
+    private String name;
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+        this.cacheKey = SHIRO_REDIS_CACHE + name + ":";
+	}
+
+	private String cacheKey;
+    private static final String SHIRO_REDIS_CACHE = "shiro-redis-cache:";
+
+    protected static final long MILLIS_PER_SECOND = 1000;
+    protected static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
+    protected static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
+    public static final long DEFAULT_GLOBAL_SESSION_TIMEOUT = 30 * MILLIS_PER_MINUTE;
+    private long globalSessionTimeout = DEFAULT_GLOBAL_SESSION_TIMEOUT;    
+
+    public long getGlobalSessionTimeout() {
+		return globalSessionTimeout;
+	}
+
+	public void setGlobalSessionTimeout(long globalSessionTimeout) {
+		this.globalSessionTimeout = globalSessionTimeout;
+	}
+
+	public EhRedisCache_spring() {
+		
+	}
+	
+//    public EhRedisCache(String name, RedisTemplate backingRedisTemplate, long globalSessionTimeout) {
+//        if (name == null) {
+//            throw new IllegalArgumentException("Cache name cannot be null.");
+//        }
+//        if (backingRedisTemplate == null) {
+//            throw new IllegalArgumentException("Backing redisTemplate cannot be null.");
+//        }
+//        this.name = name;
+//        this.cacheKey = SHIRO_REDIS_CACHE + name + ":";
+//        this.redisTemplate = backingRedisTemplate;
+//        this.globalSessionTimeout = globalSessionTimeout;
+//    }
+    
+    private String getRedisCacheKey(Object k) {
+        return (this.cacheKey + k);
+    }
+    
+	public Object getByRedisCacheKey(String redisCacheKey) throws CacheException {//redisCacheKey包括前缀，格式如: shiro-redis-cache:shiro-activeSessionCache:9308fbf1-1f2f-4dc5-826c-9f46b0868317
+		redisTemplate.boundValueOps(redisCacheKey).expire(globalSessionTimeout, TimeUnit.MILLISECONDS);
+		return redisTemplate.boundValueOps(redisCacheKey).get();
+	}
+
+    public Set<String> keys() {
+        return redisTemplate.keys(getRedisCacheKey("*"));
+    }
+
+	@Override
+	public Object getNativeCache() {
+		return this;
+	}
+
+	@Override
+	public ValueWrapper get(Object key) {
+		Element elementValue = ehCache.get(key);
+    	if (elementValue!=null) {
+            if(elementValue.getHitCount() < 10){//缓存命中次数统计小于10次内的使用ehcache的数据
+            	Object v = elementValue.getObjectValue();
+            	logger.info("Cache L1 (ehcache) :{}={}", key, v);
+            	return new SimpleValueWrapper(v);
+            }else{
+            	elementValue.resetAccessStatistics();//统计次数重置为0
+            }        	
+        }
+    	
+    	String redisCacheKey = getRedisCacheKey(key);
+    	Object v = getByRedisCacheKey(redisCacheKey);
+    	ehCache.put(new Element(key, v));//取出来之后缓存到本地
+    	logger.info("Cache L2 (redis) :{}={}",key,v);
+    	return new SimpleValueWrapper(v);
+	}
+
+	@Override
+	public <T> T get(Object key, Class<T> type) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> T get(Object key, Callable<T> valueLoader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void put(Object key, Object value) {
+    	ehCache.put(new Element(key, value));
+    	String redisCacheKey = getRedisCacheKey(key);
+        redisTemplate.boundValueOps(redisCacheKey).set(value);		
+	}
+
+	@Override
+	public ValueWrapper putIfAbsent(Object key, Object value) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void evict(Object key) {
+		ehCache.remove(key);
+		String redisCacheKey = getRedisCacheKey(key);
+        redisTemplate.delete(redisCacheKey);		
+	}
+
+	@Override
+	public void clear() throws CacheException {
+		ehCache.removeAll();
+		redisTemplate.delete(keys());
+	}
+    
+
+}

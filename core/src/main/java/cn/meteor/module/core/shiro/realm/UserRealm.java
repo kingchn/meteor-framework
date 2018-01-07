@@ -59,6 +59,14 @@ public class UserRealm extends AuthorizingRealm {
 //              getName()  //realm name          
 //      );
         SimpleSaltedAuthenticationInfo authenticationInfo = new SimpleSaltedAuthenticationInfo(user, credentialsFromStore.toCharArray(), saltFromStore, realmName);
+        
+//     // 把账号信息放到Session中，并更新缓存,用于会话管理
+//        Subject subject = SecurityUtils.getSubject();
+//        Serializable sessionId = subject.getSession().getId();
+//        ShiroSession session = (ShiroSession) sessionDao.doReadSessionWithoutExpire(sessionId);
+//        session.setAttribute("userId", su.getId());
+//        session.setAttribute("loginName", su.getLoginName());
+//        sessionDao.update(session);
         return authenticationInfo;
     }
 

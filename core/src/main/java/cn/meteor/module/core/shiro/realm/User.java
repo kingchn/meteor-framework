@@ -1,12 +1,19 @@
 package cn.meteor.module.core.shiro.realm;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 
-public class User {
+public class User implements Serializable {	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8698667923931577723L;
+
 	public static final String idFieldName = "id";
 	
 	private Map<String,Object> storage = new HashMap<String,Object>();
@@ -116,5 +123,12 @@ public class User {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public String toString() {
+//		return super.toString();
+//		return getClass().getName() + "@" + Integer.toHexString(hashCode());
+		return getClass().getSimpleName() + "@" + this.getId();
 	}
 }
