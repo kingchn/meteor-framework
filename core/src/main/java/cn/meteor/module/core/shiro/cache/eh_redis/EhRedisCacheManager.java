@@ -17,16 +17,26 @@ public class EhRedisCacheManager implements CacheManager {
 		this.redisTemplate = redisTemplate;
 	}
 	
-	private net.sf.ehcache.Cache ehCache;
-	
-	public net.sf.ehcache.Cache getEhCache() {
-        return ehCache;
-    }
+//	private net.sf.ehcache.Cache ehCache;
+//	
+//	public net.sf.ehcache.Cache getEhCache() {
+//        return ehCache;
+//    }
+//
+//    public void setEhCache(net.sf.ehcache.Cache ehCache) {
+//        this.ehCache = ehCache;
+//    }
+    
+    private net.sf.ehcache.CacheManager ehcacheManager;
 
-    public void setEhCache(net.sf.ehcache.Cache ehCache) {
-        this.ehCache = ehCache;
-    }
-	
+	public net.sf.ehcache.CacheManager getEhcacheManager() {
+		return ehcacheManager;
+	}
+
+	public void setEhcacheManager(net.sf.ehcache.CacheManager ehcacheManager) {
+		this.ehcacheManager = ehcacheManager;
+	}
+
 	protected static final long MILLIS_PER_SECOND = 1000;
     protected static final long MILLIS_PER_MINUTE = 60 * MILLIS_PER_SECOND;
     protected static final long MILLIS_PER_HOUR = 60 * MILLIS_PER_MINUTE;
@@ -43,7 +53,7 @@ public class EhRedisCacheManager implements CacheManager {
 
 	@Override
 	public <K, V> Cache<K, V> getCache(String name) throws CacheException {
-		return new EhRedisCache<K, V>(name, redisTemplate, ehCache, redisCacheTimeout);
+		return new EhRedisCache<K, V>(name, redisTemplate, ehcacheManager, redisCacheTimeout);
 	}
 	
 }
