@@ -94,9 +94,20 @@ public class ExcelUtils {
 		}
 		workbook.close();
 		return rowList;
-	}	
-
+	}
+	
 	public static <T_T> List<T_T> readBean(Workbook workbook, Class<T_T> tClass) throws Exception {
+		return readBean(workbook, tClass, null);
+	}
+
+	/**
+	 * @param workbook
+	 * @param tClass
+	 * @param fieldMap 为空时取excel表头作为字段名，非空时直接使用，数组组成为 key为列表头值，value为字段名，例如： 名称 name）
+	 * @return
+	 * @throws Exception
+	 */
+	public static <T_T> List<T_T> readBean(Workbook workbook, Class<T_T> tClass, Map<String, String> fieldMap) throws Exception {
 		List<T_T> beans = new ArrayList<T_T>();
 		
 		Map<Short, String> headerMapper = new HashMap<Short, String>();
@@ -107,9 +118,17 @@ public class ExcelUtils {
 			T_T bean = tClass.newInstance();
 			for (short colIndex = 0; colIndex < oneRow.size(); colIndex++) {//遍历一行所有单元格
 				String headCellValue = headerMapper.get(colIndex);
+				
+				String fieldName = headCellValue;//先字段名=表头名
+				if(fieldMap!=null && fieldMap.get(headCellValue)!=null) {//如果map有，先经过map映射
+					fieldName = fieldMap.get(headCellValue);//假设headCellValue为 名称，那么fieldMap的key为名称 value为name，最后获得是name
+				}
+				
 //				String fieldName = DzdzFpxxYdkExcelRequest.translateFieldName(headCellValue);
 				Method translateFieldNameMethod = tClass.getSuperclass().getDeclaredMethod("translateFieldName", String.class);
-				String fieldName = (String) translateFieldNameMethod.invoke(bean, headCellValue);//调用该类的字段名称转换方法得到字段名称
+				fieldName = (String) translateFieldNameMethod.invoke(bean, fieldName);//调用该类的字段名称转换方法得到字段名称
+
+				
 				Object value = oneRow.get(colIndex);
 				if(StringUtils.isNotEmpty(String.valueOf(value))) {//如果字段值非空，则设置对象属性值
 					BeanUtils.setProperty(bean, fieldName, value);
@@ -120,9 +139,28 @@ public class ExcelUtils {
 		return beans;
 	}
 	
+	/**
+	 * @param inputStream excel文件输入流
+	 * @param fileName 文件名
+	 * @param tClass 类
+	 * @return 数据列表
+	 * @throws Exception
+	 */
 	public static <T_T> List<T_T> readBean(InputStream inputStream,String fileName, Class<T_T> tClass) throws Exception {
+		return readBean(inputStream, fileName, tClass, null);
+	}
+	
+	/**
+	 * @param inputStream excel文件输入流
+	 * @param fileName 文件名
+	 * @param tClass 类
+	 * @param fieldMap 为空时取excel表头作为字段名，非空时直接使用，数组组成为 key为列表头值，value为字段名，例如： 名称 name）
+	 * @return 数据列表
+	 * @throws Exception
+	 */
+	public static <T_T> List<T_T> readBean(InputStream inputStream,String fileName, Class<T_T> tClass, Map<String, String> fieldMap) throws Exception {
 		Workbook workbook = getWorkbook(inputStream, fileName);
-		List<T_T> beans = ExcelUtils.readBean(workbook, tClass);
+		List<T_T> beans = ExcelUtils.readBean(workbook, tClass, fieldMap);
 		return beans;
 	}
 	
