@@ -81,6 +81,12 @@
             	<constructor-arg ref="requestResponseBodyAdvice" />
             </bean>
         </mvc:return-value-handlers>
-	</mvc:annotation-driven>	
+	</mvc:annotation-driven>
+	
+	<bean id="fileBaseAppSecretManager"  class="cn.meteor.module.core.openApi.secret.impl.FileBaseAppSecretManager">
+		<property name="propertiesFilePath" value="${core.openApi.fileBaseAppSecretManager.propertiesFilePath:openApi/appSecret.properties}"  />
+	</bean>
+	
+	<alias alias="appSecretManager" name="${core.openApi.appSecretManager.beanName:fileBaseAppSecretManager}"  />
 	
 </beans>
