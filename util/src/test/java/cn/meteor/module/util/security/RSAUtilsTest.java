@@ -249,4 +249,36 @@ public class RSAUtilsTest {
 		
 	}
 	
+	@Test
+	public void publicEncryptPrivateDecryptTest() throws UnsupportedEncodingException, Exception {
+			System.out.println(DateUtils.parseDateToString(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"));
+			KeyPair keyPair = RSAUtils.genKeyPair();
+			String base64StringPublicKey = RSAUtils.getBase64StringPublicKey(keyPair);
+			String base64StringPrivateKeyPKCS8 = RSAUtils.getBase64StringPrivateKey(keyPair);	
+			
+			System.out.println("base64StringPrivateKey:\n" + base64StringPrivateKeyPKCS8);
+			System.out.println("base64StringPublicKey:\n" + base64StringPublicKey);
+
+			String testString = "tttest123";
+			
+			
+			//加密
+			byte[] cipherBytes = RSAUtils.encryptWithBase64StringPublicKey(base64StringPublicKey, testString.getBytes("UTF-8"));
+			System.out.println("加密后的字节数组的长度: "+cipherBytes.length);
+			
+//			String cipherString = new String(cipherBytes);//会乱码
+			String cipherString = RSAUtils.byteArrayToHexString(cipherBytes);//将字节数组转成16进制数字字符串
+			System.out.println("加密后的字符串的长度: "+cipherString.length());		
+			System.out.println("加密后的密文: "+cipherString);
+			
+			//解密
+			byte[] cipherBytes2 = RSAUtils.hexToByteArray(cipherString);
+	        byte[] plainTextBytes = RSAUtils.decryptWithBase64StringPrivateKey(base64StringPrivateKeyPKCS8, cipherBytes2);
+	        
+	        String plainText = new String(plainTextBytes);
+	        System.out.println("解密结果: "+plainText);  
+	        
+	        System.out.println(DateUtils.parseDateToString(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"));
+	}
+	
 }
