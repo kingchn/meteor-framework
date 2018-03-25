@@ -25,4 +25,7 @@ public @interface RestJsonRootName {
      * @since 2.4
      */
     public String namespace() default "";
+    
+    public boolean isPrior() default false;
+    
 }

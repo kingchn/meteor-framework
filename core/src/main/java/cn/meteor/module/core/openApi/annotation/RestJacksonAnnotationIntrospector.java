@@ -87,31 +87,41 @@ public class RestJacksonAnnotationIntrospector extends JacksonAnnotationIntrospe
 		//上级调用方法com.fasterxml.jackson.databind.util.RootNameLookup.findRootName(Class<?>, MapperConfig<?>)
 		//自定义注解处理--start
 		RestJsonRootName apiAnnotation = _findAnnotation(ac, RestJsonRootName.class);
+		JsonRootName ann = _findAnnotation(ac, JsonRootName.class);
+		boolean isUseApiAnnotation = true;//是否使用RestJsonRootName
 		if(apiAnnotation != null) {
-			String serializationName = "";
-			if(StringUtils.isNotBlank(apiAnnotation.value()) ) {//如果注解有值，则使用注解的值
-				serializationName = apiAnnotation.value();
-			} else {//如果注解没值，则根据命名规则命名
-				String fullClassName = ac.getName();
-				String className = fullClassName.substring(fullClassName.lastIndexOf(".")+1, fullClassName.length());
-				serializationName = translateForLowerCamelCase(className);//
-				if(this.rootNamingStrategy==NamingStrategy.SNAKE_CASE) {//如果是蛇式
-					serializationName = translateForSnakeCase(className);
+			if(ann!=null) {//如果JsonRootName也存在，则要判断RestJsonRootName是否优先
+				if(apiAnnotation.isPrior()==false) {//如果不优先，则不要使用
+					isUseApiAnnotation = false;
 				}
 			}
+			if(isUseApiAnnotation==true) {
+				String serializationName = "";
+				if(StringUtils.isNotBlank(apiAnnotation.value()) ) {//如果注解有值，则使用注解的值
+					serializationName = apiAnnotation.value();
+				} else {//如果注解没值，则根据命名规则命名
+					String fullClassName = ac.getName();
+					String className = fullClassName.substring(fullClassName.lastIndexOf(".")+1, fullClassName.length());
+					serializationName = translateForLowerCamelCase(className);//
+					if(this.rootNamingStrategy==NamingStrategy.SNAKE_CASE) {//如果是蛇式
+						serializationName = translateForSnakeCase(className);
+					}
+				}
+				
+				
+		        String ns = apiAnnotation.namespace();
+		        if (ns != null && ns.length() == 0) {
+		            ns = null;
+		        }
+		        
+		        return PropertyName.construct(serializationName, ns);
+			}
 			
-			
-	        String ns = apiAnnotation.namespace();
-	        if (ns != null && ns.length() == 0) {
-	            ns = null;
-	        }
-	        
-	        return PropertyName.construct(serializationName, ns);
 		}
 		//自定义注解处理--end
 		
 		
-		JsonRootName ann = _findAnnotation(ac, JsonRootName.class);
+//		JsonRootName ann = _findAnnotation(ac, JsonRootName.class);
         if (ann == null) {
             return null;
         }
