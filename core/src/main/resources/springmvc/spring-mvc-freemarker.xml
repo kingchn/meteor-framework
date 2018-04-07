@@ -31,7 +31,7 @@
 	   </props>
 	  </property> -->
 	 </bean>
-	<bean id="viewResolver" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">	  
+	<bean id="viewResolverFtl" class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver">	  
 	  <!-- <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView"></property> -->
 	  <property name="viewClass" value="cn.meteor.module.core.freemarker.MyFreeMarkerView"></property>
 	  <property name="suffix" value="${core.freemarker.viewResolver.suffix:.ftl}" />
@@ -39,6 +39,7 @@
 	  <property name="exposeRequestAttributes" value="true" />
 	  <property name="exposeSessionAttributes" value="true" />
 	  <property name="exposeSpringMacroHelpers" value="true" />
+	  <property name="order" value="${core.freemarker.viewResolver.order:0}"/>
 	 </bean>
 	 
 </beans>

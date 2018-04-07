@@ -8,9 +8,10 @@
 	<description>jsp视图设置</description>
 	
 	
-	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	<bean id="viewResolverJsp" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="${core.jsp.jspConfig.prefix:/WEB-INF/views/}"/>
-		<property name="suffix" value="${core.jsp.jspConfig.suffix:.jsp}"/>
+		<property name="suffix" value="${core.jsp.jspConfig.suffix:.jsp}"/>		
+        <property name="order" value="${core.freemarker.viewResolver.order:1}"/>
 	</bean>
 	 
 </beans>
