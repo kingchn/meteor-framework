@@ -1,6 +1,7 @@
 package cn.meteor.module.util.security;
 
 import java.io.ByteArrayOutputStream;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -11,6 +12,8 @@ import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.RSAPrivateKeySpec;
+import java.security.spec.RSAPublicKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.BadPaddingException;
@@ -30,12 +33,14 @@ public class RSAUtils {
     /**
      * RSA最大加密明文大小
      */
-    private static final int MAX_ENCRYPT_BLOCK = 117;
+//    private static final int MAX_ENCRYPT_BLOCK = 117;
+    private static final int MAX_ENCRYPT_BLOCK = 116;
     
     /**
      * RSA最大解密密文大小
      */
-    private static final int MAX_DECRYPT_BLOCK = 128;
+//    private static final int MAX_DECRYPT_BLOCK = 128;
+    private static final int MAX_DECRYPT_BLOCK = 127;
 	
 	/**
      * <p>
@@ -58,8 +63,8 @@ public class RSAUtils {
      */
     public static String getBase64StringPublicKey(KeyPair keyPair) {
     	RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
-    	System.out.println("toString: "+ rsaPublicKey.toString());
-    	System.out.println("getFormat: "+ rsaPublicKey.getFormat());
+    	System.out.println("rsaPublicKey toString: "+ rsaPublicKey.toString());
+    	System.out.println("rsaPublicKey getFormat: "+ rsaPublicKey.getFormat());
     	String base64StringPublicKey = Base64.encodeBase64String(rsaPublicKey.getEncoded());//二进制数据编码为BASE64字符串
     	return base64StringPublicKey;
     }
@@ -71,9 +76,53 @@ public class RSAUtils {
      */
     public static String getBase64StringPrivateKey(KeyPair keyPair) {
     	RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+    	System.out.println("rsaPrivateKey toString: "+ rsaPrivateKey.toString());
+    	System.out.println("rsaPrivateKey getFormat: "+ rsaPrivateKey.getFormat());
     	String base64StringPrivateKey = Base64.encodeBase64String(rsaPrivateKey.getEncoded());//二进制数据编码为BASE64字符串
     	return base64StringPrivateKey;
     }
+    
+    public static RSAPublicKey getRSAPublicKeyByKeyPair(KeyPair keyPair) {
+    	RSAPublicKey rsaPublicKey = (RSAPublicKey) keyPair.getPublic();
+    	System.out.println("rsaPublicKey toString: "+ rsaPublicKey.toString());
+    	System.out.println("rsaPublicKey getFormat: "+ rsaPublicKey.getFormat());
+    	return rsaPublicKey;
+    }
+    
+    public static RSAPrivateKey getRSAPrivateKeyByKeyPair(KeyPair keyPair) {
+    	RSAPrivateKey rsaPrivateKey = (RSAPrivateKey) keyPair.getPrivate();
+    	System.out.println("rsaPrivateKey toString: "+ rsaPrivateKey.toString());
+    	System.out.println("rsaPrivateKey getFormat: "+ rsaPrivateKey.getFormat());
+    	return rsaPrivateKey;
+    }
+    
+	public static RSAPublicKey getRSAPublicKeyByModulusAndPublicExponent(BigInteger modulus, BigInteger publicExponent) throws Exception {
+		try {
+			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+			RSAPublicKeySpec keySpec = new RSAPublicKeySpec(modulus, publicExponent);
+			return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+		} catch (NoSuchAlgorithmException e) {
+			throw new Exception("无此算法：" + e.getMessage());
+		} catch (InvalidKeySpecException e) {
+			throw new Exception("公钥非法：" + e.getMessage());
+		} catch (NullPointerException e) {
+			throw new Exception("公钥数据为空：" + e.getMessage());
+		}
+	}
+
+    public static RSAPrivateKey getRSAPrivateKeyByModulusAndPrivateExponent(BigInteger modulus, BigInteger privateExponent) throws Exception {    	
+    	try {
+			KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+			RSAPrivateKeySpec keySpec = new RSAPrivateKeySpec(modulus, privateExponent);
+			return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+		} catch (NoSuchAlgorithmException e) {
+			throw new Exception("无此算法：" + e.getMessage());
+		} catch (InvalidKeySpecException e) {
+			throw new Exception("私钥非法：" + e.getMessage());
+		} catch (NullPointerException e) {
+			throw new Exception("私钥数据为空：" + e.getMessage());
+		}
+    }  
     
     
     /** 
@@ -81,7 +130,7 @@ public class RSAUtils {
      * @param base64StringPublicKey 公钥数据字符串 
      * @throws Exception 加载公钥时产生的异常 
      */  
-    public static RSAPublicKey getRSAPublicKeyByBase64StringKey(String base64StringPublicKey) throws Exception {  
+    public static RSAPublicKey getRSAPublicKeyByBase64StringKey(String base64StringPublicKey) throws Exception {
         try {  
 //            BASE64Decoder base64Decoder= new BASE64Decoder();  
 //            byte[] keyBytes= base64Decoder.decodeBuffer(publicKeyString);
@@ -90,11 +139,11 @@ public class RSAUtils {
             X509EncodedKeySpec keySpec= new X509EncodedKeySpec(keyBytes);
             return (RSAPublicKey) keyFactory.generatePublic(keySpec);
         } catch (NoSuchAlgorithmException e) {  
-            throw new Exception("无此算法"+ e.getMessage());  
+            throw new Exception("无此算法："+ e.getMessage());  
         } catch (InvalidKeySpecException e) {  
-            throw new Exception("公钥非法"+ e.getMessage());  
+            throw new Exception("公钥非法："+ e.getMessage());  
         } catch (NullPointerException e) {  
-            throw new Exception("公钥数据为空"+ e.getMessage());  
+            throw new Exception("公钥数据为空："+ e.getMessage());  
         }  
     }
     
