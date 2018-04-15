@@ -110,8 +110,8 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
                 	if(value!=null) {
                         map.put(cacheKey, value);
                         mapTimestamp.put(cacheKey, System.currentTimeMillis() );
+                    	return value;
                 	}
-                	return value;
 //                    }else{
 //                    	elementValue.resetAccessStatistics();//统计次数重置为0
 //                    }        	
