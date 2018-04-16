@@ -149,7 +149,7 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 	}
 	
 	protected ErrorResponse getErrorResponseAnalysisByKnownException(String viewName, Exception ex, HttpServletRequest request, Locale locale) {
-		logger.error("getErrorResponseAnalysisByKnownException：" + ex.toString(),ex);
+		logger.error("getErrorResponseAnalysisByKnownException：" + ex.toString(),ex);//TODO:采用debug日志级别，验证错误等不应该打印，否则错误日志太多
 		
 		ErrorResponse errorResponse = new ErrorResponse();		
 		

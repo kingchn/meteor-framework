@@ -103,7 +103,8 @@ public class ApiPermissionValidator implements ConstraintValidator<ApiPermission
 		
 		String formFormatString = value.getFormat();
 		if(formFormatString!=null&&!"".equals(formFormatString)) {
-			if(!"json".equals(formFormatString)&&!"xml".equals(formFormatString)) {//无效format
+			if(!"json".equals(formFormatString)&&!"xml".equals(formFormatString)
+					&&!"enc_json".equals(formFormatString)) {//无效format
 				String messageTemplate = "ApiPermission.invalid.format";
 				context.disableDefaultConstraintViolation();
 				context.buildConstraintViolationWithTemplate(messageTemplate)

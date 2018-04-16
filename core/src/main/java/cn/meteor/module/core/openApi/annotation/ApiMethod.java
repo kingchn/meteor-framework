@@ -428,7 +428,8 @@ public @interface ApiMethod {
 	 * @see org.springframework.http.MediaType
 	 */
 //	String[] produces() default {};
-	String[] produces() default {"application/xml;charset=UTF-8", "application/json;charset=UTF-8"};//modify by shenjc
+//	String[] produces() default {"application/xml;charset=UTF-8", "application/json;charset=UTF-8"};//modify by shenjc
+	String[] produces() default {"application/xml;charset=UTF-8", "application/json;charset=UTF-8", "text/enc_json;charset=UTF-8"};//modify by shenjc
 	
 	
 	String[] handler() default {};

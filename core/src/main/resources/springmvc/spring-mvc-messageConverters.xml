@@ -15,6 +15,7 @@
         <ref bean="stringHttpMessageConverter" />
         <ref bean="mappingJackson2HttpMessageConverter" />
         <ref bean="mappingJackson2XmlHttpMessageConverter" />
+        <ref bean="mappingEncryptJackson2HttpMessageConverter" />
     </util:list>
     
     
@@ -55,6 +56,16 @@
 			</list>
 		</property>
 		<property name="objectMapper" ref="objectMapperForXml" />
+     </bean>
+     
+     <bean id="mappingEncryptJackson2HttpMessageConverter" class="cn.meteor.module.core.openApi.converter.MappingEncryptJackson2HttpMessageConverter">
+		<property name="prettyPrint" value="true"/>	<!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+		<property name="supportedMediaTypes">
+			<list>
+			    <value>text/enc_json;charset=UTF-8</value>
+			</list>
+		</property>
+		<property name="objectMapper" ref="objectMapperForJsonWrapRootValue" />
      </bean>
     
   

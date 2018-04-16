@@ -6,7 +6,7 @@ import cn.meteor.module.core.openApi.annotation.RestJsonRootName;
 
 
 //@XmlRootElement(name="response")
-@RestJsonRootName
+@RestJsonRootName(isPrior=false)
 public class ErrorResponse extends BaseResponse {
 
 	/**

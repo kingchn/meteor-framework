@@ -23,6 +23,7 @@
             	<entry key="json" value="application/json;charset=UTF-8" />
 				<entry key="xml" value="application/xml;charset=UTF-8" />
 				<entry key="html" value="text/html;charset=UTF-8" />
+				<entry key="enc_json" value="text/enc_json;charset=UTF-8" />
 			</map>
 		</constructor-arg>
 		<property name="parameterName" value="${core.openApi.restParameterContentNegotiationStrategy.parameterName:format}" />
@@ -49,6 +50,7 @@
 				<entry key="html" value="text/html;charset=UTF-8" />
 				<!-- <entry key="file" value="application/octet-stream" />
 				<entry key="image" value="image/*" /> -->
+				<entry key="enc_json" value="text/enc_json;charset=UTF-8" />
 			</map>
         </property>
 	</bean>
