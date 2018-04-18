@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.SerializationConfig;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 
-public class MappingEncryptJackson2HttpMessageConverter extends AbstractJackson2HttpMessageConverter {
+public class MappingEncryptJackson2HttpMessageConverter_bak extends AbstractJackson2HttpMessageConverter {
 
 	private String jsonPrefix;
 
@@ -36,7 +36,7 @@ public class MappingEncryptJackson2HttpMessageConverter extends AbstractJackson2
 	 * Construct a new {@link MappingJackson2HttpMessageConverter} using default configuration
 	 * provided by {@link Jackson2ObjectMapperBuilder}.
 	 */
-	public MappingEncryptJackson2HttpMessageConverter() {
+	public MappingEncryptJackson2HttpMessageConverter_bak() {
 		this(Jackson2ObjectMapperBuilder.json().build());
 	}
 
@@ -45,7 +45,7 @@ public class MappingEncryptJackson2HttpMessageConverter extends AbstractJackson2
 	 * You can use {@link Jackson2ObjectMapperBuilder} to build it easily.
 	 * @see Jackson2ObjectMapperBuilder#json()
 	 */
-	public MappingEncryptJackson2HttpMessageConverter(ObjectMapper objectMapper) {
+	public MappingEncryptJackson2HttpMessageConverter_bak(ObjectMapper objectMapper) {
 		super(objectMapper, MediaType.APPLICATION_JSON, new MediaType("application", "*+json"));
 	}
 
@@ -150,9 +150,43 @@ public class MappingEncryptJackson2HttpMessageConverter extends AbstractJackson2
 					config.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
 				objectWriter = objectWriter.with(this.ssePrettyPrinter);
 			}
+
+			
+			//获取要加密的对象
+			Object cipherObject = null;			
+			Method getCipherObjectMethod = null;
+			try {				
+				getCipherObjectMethod = value.getClass().getDeclaredMethod("getCipherObject");
+			} catch (Exception e) {
+					try {
+						getCipherObjectMethod = value.getClass().getSuperclass().getDeclaredMethod("getCipherObject");
+					} catch (Exception e1) {
+					}
+			}
+			if(getCipherObjectMethod!=null) {
+				try {
+					cipherObject = getCipherObjectMethod.invoke(value);
+				} catch (Exception e) {
+					logger.error(e);
+				}
+			} else {
+				logger.error("enc_json==>调用response的getCipherObject方法出错");
+			}	
 			
 			
-			String plainTextJson = objectMapper.writeValueAsString(value);
+			/*ByteArrayOutputStream baosmForCipherText = new ByteArrayOutputStream();
+			JsonGenerator generatorForCipherText = this.objectMapper.getFactory().createGenerator(baosmForCipherText, encoding);
+			writePrefix(generatorForCipherText, cipherObject);
+			objectWriter.writeValue(generatorForCipherText, cipherObject);
+			writeSuffix(generatorForCipherText, cipherObject);
+			generatorForCipherText.flush();
+			byte[] bytesForCipherText = baosmForCipherText.toByteArray();
+			String ciphertext = new String(bytesForCipherText);
+			ciphertext = ciphertext+"ddd";*/
+			
+			//要加密的json不要自动换行
+			objectMapper.configure(SerializationFeature.INDENT_OUTPUT, false);
+			String cipherJson = objectMapper.writeValueAsString(cipherObject);
 			
 			//执行response定义的加密方法，并获取密文
 			Object cipherText = null;
@@ -167,7 +201,7 @@ public class MappingEncryptJackson2HttpMessageConverter extends AbstractJackson2
 			}
 			if(getEncryptMethod!=null) {
 				try {
-					cipherText = getEncryptMethod.invoke(value, plainTextJson);
+					cipherText = getEncryptMethod.invoke(value, cipherJson);
 				} catch (Exception e) {
 					logger.error(e);
 				}
@@ -175,24 +209,38 @@ public class MappingEncryptJackson2HttpMessageConverter extends AbstractJackson2
 				logger.error("enc_json==>调用response的encrypt方法出错");
 			}
 			
+			//将密文设置到response中
+			Method setCiphertextMethod = null;
+			try {				
+				setCiphertextMethod = value.getClass().getDeclaredMethod("setCipherText", String.class);				
+			} catch (Exception e) {
+					try {
+						setCiphertextMethod = value.getClass().getSuperclass().getDeclaredMethod("setCipherText", String.class);
+					} catch (Exception e1) {
+					}
+			}
+			if(setCiphertextMethod!=null) {
+				try {
+					setCiphertextMethod.invoke(value, cipherText);
+				} catch (Exception e) {
+					logger.error(e);
+				}
+			} else {
+				logger.error("enc_json==>调用response的setCipherText方法出错");
+			}
+			
 			
 			if(config.isEnabled(SerializationFeature.INDENT_OUTPUT)) {
 				objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 			}
 			
-			if(cipherText!=null) {
-				outputMessage.getBody().write(cipherText.toString().getBytes());	
-			} else {
-
-				objectWriter.writeValue(generator, value);
-				
-				writeSuffix(generator, value);
-				generator.flush();
-				byte[] bytes = baosm.toByteArray();
-				String jsonString = new String(bytes);
-				outputMessage.getBody().write(jsonString.getBytes());	
-			}
-				
+			objectWriter.writeValue(generator, value);
+			
+			writeSuffix(generator, value);
+			generator.flush();
+			byte[] bytes = baosm.toByteArray();
+			String jsonString = new String(bytes);
+			outputMessage.getBody().write(jsonString.getBytes());		
 
 		}
 		catch (JsonProcessingException ex) {
