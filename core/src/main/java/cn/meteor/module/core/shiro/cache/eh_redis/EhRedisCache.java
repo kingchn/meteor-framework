@@ -10,6 +10,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
@@ -37,8 +38,8 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     /**
      * Backing instance.
      */
-    private final Map<K, V> map = new HashMap<>();
-    private final Map<K, Long> mapTimestamp = new HashMap<>();
+    private final Map<K, V> map = new ConcurrentHashMap<>();
+    private final Map<K, Long> mapTimestamp = new ConcurrentHashMap<>();
 
     /**
      * The name of this cache.
@@ -96,7 +97,7 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
 //            	System.out.println("cacheTimpstamp:" + new Date(cacheTimpstamp));
         	long cacheExpireTimpstamp=System.currentTimeMillis()-1000;
 //            	System.out.println("cacheExpireTimpstamp:" + new Date(cacheExpireTimpstamp));
-        	if(cacheTimpstamp!=null  && cacheTimpstamp > cacheExpireTimpstamp) {//如果应用缓存map存在，并且是在1秒前存储的，则从应用缓存map中获取
+        	if(cacheTimpstamp!=null  && cacheTimpstamp > cacheExpireTimpstamp) {//如果应用缓存map存在，并且是在1秒前到当前时间内存储的，即短时间内设置并获取，则从应用缓存map中获取
             	V mapValue = map.get(cacheKey);            	
             	if(mapValue!=null) {
             		return mapValue;
