@@ -44,8 +44,8 @@ public class MyFreeMarkerView extends FreeMarkerView {
 //		<#assign rootUrl=request.scheme+"://"+request.serverName+":"+request.serverPort+request.contextPath />
 //		</#if>
 		String rootUrl="";
-		if(Boolean.TRUE.equals(model.get(HTMLConstants.IS_CREATE_HTML))) {
-			rootUrl = model.get(HTMLConstants.ROOT_URL).toString();
+		if(Boolean.TRUE.equals(model.get(HTMLConstants.REQUEST_HEADER_NAME_IS_CREATE_HTML))) {
+			rootUrl = model.get(HTMLConstants.REQUEST_HEADER_NAME_ROOT_URL).toString();
 		} else {
 			if(request.getServerPort()==80) {
 				rootUrl = request.getScheme() + "://" + request.getServerName() + request.getContextPath();
@@ -76,10 +76,10 @@ public class MyFreeMarkerView extends FreeMarkerView {
 //		processTemplate(getTemplate(locale), fmModel, response);
 		
 		
-		if(Boolean.TRUE.equals(model.get(HTMLConstants.IS_CREATE_HTML))) {
-			String targetFilePath=model.get(HTMLConstants.TARGET_FILE_PATH).toString();
-        	String targetFilename=model.get(HTMLConstants.TARGET_FILE_NAME).toString();
-        	String targetTempFilename=model.get(HTMLConstants.TARGET_TEMP_FILE_NAME).toString();
+		if(Boolean.TRUE.equals(model.get(HTMLConstants.REQUEST_HEADER_NAME_IS_CREATE_HTML))) {
+			String targetFilePath=model.get(HTMLConstants.REQUEST_HEADER_NAME_HTML_TARGET_FILE_PATH).toString();
+        	String targetFilename=model.get(HTMLConstants.HTML_TARGET_FILE_NAME).toString();
+        	String targetTempFilename=model.get(HTMLConstants.HTML_TARGET_TEMP_FILE_NAME).toString();
         	Result result = createHTML(getTemplate(locale), fmModel, request, response, targetFilePath, targetTempFilename);
         	if(result.isSuccess == true) {
         		File tempFile = new File(targetFilePath + "/" + targetTempFilename);
