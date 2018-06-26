@@ -61,8 +61,10 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
         	if(isRootUrlAbsolute==true) {
         		if(request.getServerPort()==80) {
     				rootUrl = request.getScheme() + "://" + request.getServerName();
+//    				rootUrl = "//" + request.getServerName();
     			} else {
     				rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+//    				rootUrl = "//" + request.getServerName() + ":" + request.getServerPort();
     			}
         	}
         	rootUrl += request.getContextPath();
