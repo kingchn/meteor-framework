@@ -49,8 +49,10 @@ public class MyFreeMarkerView extends FreeMarkerView {
 		} else {
 			if(request.getServerPort()==80) {
 				rootUrl = request.getScheme() + "://" + request.getServerName() + request.getContextPath();
+//				rootUrl = "//" + request.getServerName() + request.getContextPath();
 			} else {
 				rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+//				rootUrl = "//" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 			}
 		}
 		
