@@ -44,22 +44,25 @@ public class MyFreeMarkerView extends FreeMarkerView {
 //		<#assign rootUrl=request.scheme+"://"+request.serverName+":"+request.serverPort+request.contextPath />
 //		</#if>
 		
-		if(model.get(ROOT_URL) == null) {
-			String rootUrl="";
-			if(Boolean.TRUE.equals(model.get(HTMLConstants.REQUEST_HEADER_NAME_IS_CREATE_HTML))) {
-				rootUrl = model.get(HTMLConstants.REQUEST_HEADER_NAME_ROOT_URL).toString();
-			} else {
-				if(request.getServerPort()==80) {
-					rootUrl = request.getScheme() + "://" + request.getServerName() + request.getContextPath();
+		
+		String rootUrl="";
+		if(Boolean.TRUE.equals(model.get(HTMLConstants.REQUEST_HEADER_NAME_IS_CREATE_HTML))) {
+			rootUrl = model.get(HTMLConstants.REQUEST_HEADER_NAME_ROOT_URL).toString();
+			model.put(ROOT_URL, rootUrl);//如果是静态化，则rootUrl使用来自请求头root_url的值
+		} else {
+			if(request.getServerPort()==80) {
+				rootUrl = request.getScheme() + "://" + request.getServerName() + request.getContextPath();
 //					rootUrl = "//" + request.getServerName() + request.getContextPath();
-				} else {
-					rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+			} else {
+				rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
 //					rootUrl = "//" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-				}
 			}
-			
-			model.put(ROOT_URL, rootUrl);
+			if(model.get(ROOT_URL) == null) {
+				model.put(ROOT_URL, rootUrl);//如果是非静态化，rootUrl为空时，则初始化rootUrl的值
+			}
 		}
+			
+			
 		
 		super.exposeHelpers(model, request);
 	}

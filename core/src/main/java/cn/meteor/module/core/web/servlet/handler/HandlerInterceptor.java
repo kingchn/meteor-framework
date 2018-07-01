@@ -68,7 +68,10 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
     			}
         	}
         	rootUrl += request.getContextPath();
-            modelAndView.addObject(ROOT_URL, rootUrl);
+        	Object rootUrlObject = modelAndView.getModel().get(ROOT_URL);
+            if(rootUrlObject==null || "".equals(rootUrlObject)) {//如果rootUrl原来没值，则设置值
+            	modelAndView.addObject(ROOT_URL, rootUrl);
+            }
             Object resUrlObject = modelAndView.getModel().get(RES_URL);
             if(resUrlObject==null || "".equals(resUrlObject)) {//如果配置留空，则使用ROOT_URL
             	modelAndView.addObject(RES_URL, rootUrl);
