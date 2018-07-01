@@ -43,20 +43,23 @@ public class MyFreeMarkerView extends FreeMarkerView {
 //		<#else>
 //		<#assign rootUrl=request.scheme+"://"+request.serverName+":"+request.serverPort+request.contextPath />
 //		</#if>
-		String rootUrl="";
-		if(Boolean.TRUE.equals(model.get(HTMLConstants.REQUEST_HEADER_NAME_IS_CREATE_HTML))) {
-			rootUrl = model.get(HTMLConstants.REQUEST_HEADER_NAME_ROOT_URL).toString();
-		} else {
-			if(request.getServerPort()==80) {
-				rootUrl = request.getScheme() + "://" + request.getServerName() + request.getContextPath();
-//				rootUrl = "//" + request.getServerName() + request.getContextPath();
-			} else {
-				rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-//				rootUrl = "//" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-			}
-		}
 		
-		model.put(ROOT_URL, rootUrl);
+		if(model.get(ROOT_URL) == null) {
+			String rootUrl="";
+			if(Boolean.TRUE.equals(model.get(HTMLConstants.REQUEST_HEADER_NAME_IS_CREATE_HTML))) {
+				rootUrl = model.get(HTMLConstants.REQUEST_HEADER_NAME_ROOT_URL).toString();
+			} else {
+				if(request.getServerPort()==80) {
+					rootUrl = request.getScheme() + "://" + request.getServerName() + request.getContextPath();
+//					rootUrl = "//" + request.getServerName() + request.getContextPath();
+				} else {
+					rootUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+//					rootUrl = "//" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+				}
+			}
+			
+			model.put(ROOT_URL, rootUrl);
+		}
 		
 		super.exposeHelpers(model, request);
 	}
