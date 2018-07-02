@@ -91,6 +91,11 @@ public class MyFreeMarkerView extends FreeMarkerView {
         	Result result = createHTML(getTemplate(locale), fmModel, request, response, targetFilePath, targetTempFilename);
         	if(result.isSuccess == true) {
         		File tempFile = new File(targetFilePath + "/" + targetTempFilename);
+        		String tempFileContent = FileUtils.readFileToString(tempFile, "utf-8");
+        		boolean hasError = tempFileContent.contains("<!--ERROR_TAG!!!-->");
+        		if(hasError==true) {//如果有错误，则不做操作
+        			return;
+        		}
     			File destFile = new File(targetFilePath + "/" + targetFilename);
     			String tempFileMd5String = "";
     			String destFileMd5String = null;
