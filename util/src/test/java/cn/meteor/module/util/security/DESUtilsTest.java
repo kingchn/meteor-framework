@@ -39,4 +39,12 @@ public class DESUtilsTest {
 		String plainString = DESUtils.decryptWithBase64(encryptBase64String, desKey);
 		logger.info(plainString);
 	}
+	
+	@Test
+	public void testDecryptWithBase64() throws UnsupportedEncodingException {
+		String desKey = "12345678";
+		String encryptBase64String = "DxyctJHXDNxkbhTKP6Y0Z0+cQ3UVvD1PSpYvqZk61j+rm33KNgmBGC+Pls45nWb98RG9Tx+bhGvvR9lD0hY8tlTJaYhCPtoB+7WeJDJS7rAtI9R2P+Gt9AC0JZemYXXO";
+		String plainString = DESUtils.decryptWithBase64(encryptBase64String, desKey);
+		logger.info(plainString);
+	}
 }
