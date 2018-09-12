@@ -1,45 +1,30 @@
-package cn.meteor.module.core.shiro.cache.eh_redis;
+package cn.meteor.module.core.shiro.cache.redis;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheException;
-import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.ValidatingSession;
 import org.springframework.data.redis.core.RedisTemplate;
 
 import cn.meteor.module.core.shiro.session.ShiroSession;
-import net.sf.ehcache.Element;
 
-public class EhRedisCache<K, V> implements Cache<K, V> {
+public class RedisCache<K, V> implements Cache<K, V> {
 	
-	private static final Logger logger = LogManager.getLogger(EhRedisCache.class);
+	private static final Logger logger = LogManager.getLogger(RedisCache.class);
 
     /**
      * Backing instance.
      */
     private RedisTemplate<K, V> redisTemplate;
-    
-    private net.sf.ehcache.Cache ehCache;
-    
-    /**
-     * Backing instance.
-     */
-    private final Map<K, V> map = new ConcurrentHashMap<>();
-    private final Map<K, Long> mapTimestamp = new ConcurrentHashMap<>();
 
     /**
      * The name of this cache.
@@ -68,7 +53,7 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
 		this.redisCacheTimeout = redisCacheTimeout;
 	}
 
-	public EhRedisCache(String name, RedisTemplate backingRedisTemplate, net.sf.ehcache.CacheManager ehcacheManager, long redisCacheTimeout) {
+	public RedisCache(String name, RedisTemplate backingRedisTemplate, long redisCacheTimeout) {
         if (name == null) {
             throw new IllegalArgumentException("Cache name cannot be null.");
         }
@@ -78,14 +63,8 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
         this.name = name;
         this.cacheKeyPrefix = SHIRO_CACHE + name + ":";
         this.redisTemplate = backingRedisTemplate;
-//        this.ehCache = ehCache;
-        this.ehCache = ehcacheManager.getCache(name);
         this.redisCacheTimeout = redisCacheTimeout;
     }
-    
-//    private K getRedisCacheKey(Object k) {
-//        return (K) (this.cacheKeyPrefix + k);
-//    }
     
 	private V getByRedisCacheKey(K redisCacheKey) throws CacheException {//redisCacheKey包括前缀，格式如: shiro-redis-cache:shiro-activeSessionCache:9308fbf1-1f2f-4dc5-826c-9f46b0868317
 //		redisTemplate.boundValueOps(redisCacheKey).expire(redisCacheTimeout, TimeUnit.MILLISECONDS);
@@ -93,35 +72,10 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
 	}
 
 	private V getByCacheKey(K cacheKey, boolean alsoGetFromRedis, boolean isAlsoGetFromRedisAndUpdateEhcache) {
-//        	Long cacheTimpstamp = mapTimestamp.get(cacheKey);
-////            	System.out.println("cacheTimpstamp:" + new Date(cacheTimpstamp));
-//        	long cacheExpireTimpstamp=System.currentTimeMillis()-1000;
-////            	System.out.println("cacheExpireTimpstamp:" + new Date(cacheExpireTimpstamp));
-//        	if(cacheTimpstamp!=null  && cacheTimpstamp > cacheExpireTimpstamp) {//如果应用缓存map存在，并且是在1秒前到当前时间内存储的，即短时间内设置并获取，则从应用缓存map中获取
-//            	V mapValue = map.get(cacheKey);            	
-//            	if(mapValue!=null) {
-//            		return mapValue;
-//            	}
-//        	}
-//        	Element elementValue = ehCache.get(cacheKey);
-//        	if (elementValue != null) {
-////                    if(elementValue.getHitCount() < 5){//缓存命中次数统计小于20次内的使用ehcache的数据
-//                	V value = (V) elementValue.getObjectValue();
-//                	logger.info("EhRedisCache L1 (ehcache) get :{}={}  hitCount:{}", cacheKey, value, elementValue.getHitCount());
-//                	if(value!=null) {
-//                        map.put(cacheKey, value);
-//                        mapTimestamp.put(cacheKey, System.currentTimeMillis() );
-//                    	return value;
-//                	}
-////                    }else{
-////                    	elementValue.resetAccessStatistics();//统计次数重置为0
-////                    }        	
-//            }
-        	
         	if(alsoGetFromRedis==true) {
-                logger.debug("EhRedisCache-get-redis-get==========");
+//                logger.debug("RedisCache-get-redis-get==========");
             	V value = getByRedisCacheKey(cacheKey);
-            	logger.debug("EhRedisCache L2 (redis) get :{}={}",cacheKey, value);
+//            	logger.debug("RedisCache L2 (redis) get :{}={}",cacheKey, value);
             	if(value != null && isAlsoGetFromRedisAndUpdateEhcache == true) {
                 	//*==========================================
                 	if (value instanceof ShiroSession) {
@@ -132,11 +86,8 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     	          	}
                 	//*==========================================
                 	if( !(value instanceof Serializable)) {
-                		logger.debug("============>value:" + value);
+                		logger.debug("============>value:" + value + "is not instanceof Serializable");
                 	}
-                	ehCache.put(new Element(cacheKey, value));//取出来之后缓存到本地
-                    map.put(cacheKey, value);
-                    mapTimestamp.put(cacheKey, System.currentTimeMillis() );
             	}
             	return value;
         	} else {
@@ -162,7 +113,7 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     
     private void cacheToRedis(K cacheKey, V value) throws CacheException {
 //        redisTemplate.boundValueOps(cacheKey).set(value);
-        logger.debug("EhRedisCache-put-redis-put==========");
+//        logger.debug("RedisCache-put-redis-put==========");
         redisTemplate.boundValueOps(cacheKey).set(value, redisCacheTimeout, TimeUnit.MILLISECONDS);
     }
 
@@ -172,12 +123,9 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
             V previous = get(key);
             if(value!=null) {
                 K cacheKey = (K) (cacheKeyPrefix + key);
-                map.put(cacheKey, value);
-                mapTimestamp.put(cacheKey, System.currentTimeMillis() );
             	if( !(value instanceof Serializable)) {
-            		logger.debug("============>value2:" + value);
+            		logger.debug("============>value:" + value + "is not instanceof Serializable");
             	}
-            	ehCache.put(new Element(cacheKey, value));            	
             	//*==========================================
         		if (value instanceof Serializable) {
         		    if (value instanceof ValidatingSession) {
@@ -215,9 +163,7 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     }
     
     private void removeByCacheKey(K cacheKey) {
-    	map.remove(cacheKey);
-    	ehCache.remove(cacheKey);
-        logger.debug("EhRedisCache-remove-redis-remove==========");
+//        logger.debug("RedisCache-remove-redis-remove==========");
         redisTemplate.delete(cacheKey);
     }
 
@@ -242,9 +188,7 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
             logger.trace("Clearing all objects from cache [" + this.getName() + "]");
         }
         try {
-        	map.clear();
-        	ehCache.removeAll();
-            logger.debug("EhRedisCache-clear-redis-delete==========");
+            logger.debug("RedisCache-clear-redis-delete==========");
         	redisTemplate.delete(keys());
         } catch (Throwable t) {
         	logger.error("调用clear出错", t);
@@ -282,12 +226,16 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     public Set<K> keys() {
         try {
             @SuppressWarnings({"unchecked"})
-            List<K> keys = ehCache.getKeys();
-            if (!isEmpty(keys)) {
-                return Collections.unmodifiableSet(new LinkedHashSet<K>(keys));
-            } else {
-                return Collections.emptySet();
-            }
+//            List<K> keys = ehCache.getKeys();
+            K cacheKey = (K) (cacheKeyPrefix + "*");
+            Set<K> keySet =redisTemplate.keys(cacheKey);
+            return keySet;
+//            List<K> keys = new ArrayList<K>(keySet);
+//            if (!isEmpty(keys)) {
+//                return Collections.unmodifiableSet(new LinkedHashSet<K>(keys));
+//            } else {
+//                return Collections.emptySet();
+//            }
         } catch (Throwable t) {
         	logger.error("调用keys出错", t);
             throw new CacheException(t);
@@ -363,24 +311,32 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     }
     
     public Collection<V> values_session() {
-        @SuppressWarnings({"unchecked"})
-        List<K> keys = ehCache.getKeys();
-        if (!isEmpty(keys)) {
-            List<V> values = new ArrayList<V>(keys.size());
-            for (K key : keys) {
-//                    V value = get(key);
-            	V value = getByCacheKey(key, false, false);
-                if (value != null && value instanceof Session) {
-                    values.add(value);
-                }
-                if(key!=null && value==null) {//key有 value没有
-                	removeByCacheKey(key);//清理
-                }
-            }
-            return Collections.unmodifiableList(values);
-        } else {
-            return Collections.emptyList();
-        }
+//        @SuppressWarnings({"unchecked"})
+//        List<K> keys = ehCache.getKeys();
+//        if (!isEmpty(keys)) {
+//            List<V> values = new ArrayList<V>(keys.size());
+//            for (K key : keys) {
+////                    V value = get(key);
+//            	V value = getByCacheKey(key, false, false);
+//                if (value != null && value instanceof Session) {
+//                    values.add(value);
+//                }
+//                if(key!=null && value==null) {//key有 value没有
+//                	removeByCacheKey(key);//清理
+//                }
+//            }
+//            return Collections.unmodifiableList(values);
+//        } else {
+//            return Collections.emptyList();
+//        }   
+
+        K cacheKey = (K) (cacheKeyPrefix + "*");
+		List<V> values = redisTemplate.opsForList().range(cacheKey, 0, -1);
+		if (values != null) {
+			return Collections.unmodifiableList(values);
+		} else {
+			return Collections.emptyList();
+		}
     }
     
     //////////////////////////
@@ -393,6 +349,6 @@ public class EhRedisCache<K, V> implements Cache<K, V> {
     
 
     public String toString() {
-    	return "EhRedisCache [" + this.getName() + "]";
+    	return "RedisCache [" + this.getName() + "]";
     }
 }
