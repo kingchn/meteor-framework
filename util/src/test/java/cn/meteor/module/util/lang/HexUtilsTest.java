@@ -29,8 +29,8 @@ public class HexUtilsTest {
 		
 //		String hexString = "\\x23\\x66\\x70\\x68\\x6d\\x6a\\x79";
 		
-//		String fileName = "showModalDialog1.js";
-		String fileName = "10.js";
+		String fileName = "js/showModalDialog1.js";
+//		String fileName = "10.js";
 		ClassLoader classLoader = getClass().getClassLoader();
 		URL url = classLoader.getResource(fileName);
 		File file = FileUtils.toFile(url);
