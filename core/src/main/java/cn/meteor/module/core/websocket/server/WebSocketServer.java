@@ -1,8 +1,5 @@
 package cn.meteor.module.core.websocket.server;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.annotation.PreDestroy;
 
 import org.apache.logging.log4j.LogManager;
@@ -38,8 +35,8 @@ public class WebSocketServer extends AfterSpringBegin {
 	//服务端口
 	protected int port;
 	
-	//服务对
-	protected String serverParis;
+//	//服务对
+//	protected String serverParis;
 	
 
 	//BS的I/O处理类
@@ -148,17 +145,17 @@ public class WebSocketServer extends AfterSpringBegin {
 	
 //	public abstract String getLocalHttpAddress();
 	
-	Map<String, String> serverMap = new HashMap<>();
-	
-	private String getLocalHttpAddress(String key) {
-		String[] servers = serverParis.split(";");
-		for (String serv : servers) {
-			String[] oneServer = serv.split(",");
-			serverMap.put(oneServer[0], oneServer[0]);
-		}
-		String result = serverMap.get(key);
-		return result;
-	}
+//	Map<String, String> serverMap = new HashMap<>();
+//	
+//	private String getLocalHttpAddress(String key) {
+//		String[] servers = serverParis.split(";");
+//		for (String serv : servers) {
+//			String[] oneServer = serv.split(",");
+//			serverMap.put(oneServer[0], oneServer[0]);
+//		}
+//		String result = serverMap.get(key);
+//		return result;
+//	}
 	
 	//执行之后关闭
 	@PreDestroy
@@ -167,13 +164,13 @@ public class WebSocketServer extends AfterSpringBegin {
         workerGroup.shutdownGracefully();		
 	}
 
-	public String getServerParis() {
-		return serverParis;
-	}
-
-	public void setServerParis(String serverParis) {
-		this.serverParis = serverParis;
-	}
+//	public String getServerParis() {
+//		return serverParis;
+//	}
+//
+//	public void setServerParis(String serverParis) {
+//		this.serverParis = serverParis;
+//	}
 	
 	
 
