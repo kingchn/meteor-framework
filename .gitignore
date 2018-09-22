@@ -16,3 +16,5 @@ logs/
 package*.bat
 install*.bat
 deploy*.bat
+
+*_zh/
