@@ -1,8 +1,12 @@
 package cn.meteor.module.core.web.servlet.handler;
 
+import java.lang.reflect.Method;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -26,6 +30,46 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
 		this.isRootUrlAbsolute = isRootUrlAbsolute;
 	}
 	
+	/**
+	 * ref参数名
+	 */
+	private String refParamName = "ref";
+	
+	/**
+	 * ref参数值
+	 */
+	private String refParamValue = "addtabs";
+	
+	/**
+	 * ref目标视图
+	 */
+	private String refTargetView = "main";
+	
+	public String getRefParamName() {
+		return refParamName;
+	}
+
+	public void setRefParamName(String refParamName) {
+		this.refParamName = refParamName;
+	}
+
+	public String getRefParamValue() {
+		return refParamValue;
+	}
+
+	public void setRefParamValue(String refParamValue) {
+		this.refParamValue = refParamValue;
+	}
+
+	public String getRefTargetView() {
+		return refTargetView;
+	}
+
+	public void setRefTargetView(String refTargetView) {
+		this.refTargetView = refTargetView;
+	}
+	
+	
 //	@Override
 //	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 //			throws Exception {
@@ -39,9 +83,26 @@ public class HandlerInterceptor extends HandlerInterceptorAdapter {
 
 
 
+
+
 	@Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
             ModelAndView modelAndView) throws Exception {
+		
+		//注解拦截
+		if(handler instanceof HandlerMethod) {
+			HandlerMethod handlerMethod = (HandlerMethod) handler;
+			Method method = handlerMethod.getMethod();
+			//处理注解RefererHandle，实现referer，并重定向到指定页面
+			RefererHandle refererHandleAnnotation = method.getAnnotation(RefererHandle.class);
+			if (refererHandleAnnotation != null) {
+				String refPameValue= request.getParameter(refParamName);
+				if(StringUtils.isNotBlank(refPameValue) && refParamValue.equals(refPameValue)) {
+					modelAndView.addObject("referer", request.getServletPath());
+					modelAndView.setViewName(refTargetView);
+				}
+			}
+		}		
 		
 		if (null != modelAndView && null != modelAndView.getModel()) {
             Object result = modelAndView.getModel().get("result");
