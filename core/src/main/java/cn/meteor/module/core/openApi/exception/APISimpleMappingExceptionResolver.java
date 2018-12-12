@@ -129,9 +129,10 @@ public class APISimpleMappingExceptionResolver extends SimpleMappingExceptionRes
 					String detailCode = MessageFormat.format(ErrorMsgUtils.getErrorCode(errorType), new Object[] { fieldError.getField() });
 					errorResponse.setDetailCode(detailCode);
 					String defaultMessage = fieldError.getDefaultMessage();
-//					if(defaultMessage.startsWith("~")) {
-					if(StringUtils.isNoneBlank(defaultMessage)) {
-//						defaultMessage = defaultMessage.substring(1);
+//					String defaultMessage = null;//fieldError.getDefaultMessage();
+					if(defaultMessage.startsWith("~")) {
+//					if(StringUtils.isNotBlank(defaultMessage)) {
+						defaultMessage = defaultMessage.substring(1);
 						String detailMsg = MessageFormat.format(defaultMessage, new Object[] {fieldError.getField(), fieldError.getRejectedValue()});
 						errorResponse.setDetailMsg(detailMsg);
 					} else {
