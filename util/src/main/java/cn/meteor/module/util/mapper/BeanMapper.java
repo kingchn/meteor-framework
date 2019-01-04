@@ -3,6 +3,7 @@ package cn.meteor.module.util.mapper;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.dozer.DozerBeanMapper;
 import org.dozer.MappingException;
 
@@ -61,7 +62,12 @@ public class BeanMapper {
 		MapperFacade  mapper = mapperFactory.getMapperFacade();
 		ClassMapBuilder<S, D> classMapBuilder = mapperFactory.classMap(sourceClass, destinationClass);
 		for (String key : customMap.keySet()) {
-			classMapBuilder.field(key, customMap.get(key));
+			String target = customMap.get(key);
+			if(StringUtils.isNotBlank(target)) {
+				classMapBuilder.field(key, target);
+			} else {
+				classMapBuilder.exclude(key);
+			}
 		}
 		classMapBuilder.byDefault().register();
 		return mapper;
