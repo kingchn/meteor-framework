@@ -35,60 +35,21 @@ public class MimeJavaMailSender {
 	public void setMailSender(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
 	}
-	
-//	/**
-//	 * 发送邮件
-//	 * @param to 收件人
-//	 * @param subject 标题
-//	 * @param text 内容
-//	 * @throws MessagingException 
-//	 */
-//	public void sendMail(String to, String subject, String text) throws MessagingException {
-//			MimeMessage msg = mailSender.createMimeMessage();
-//			MimeMessageHelper helper = new MimeMessageHelper(msg, true, DEFAULT_ENCODING);
-//
-//			helper.setTo(to);
-////			helper.setFrom(from);
-//			helper.setSubject(subject);
-//			
-//			helper.setText(text, true);
-//
-//			mailSender.send(msg);
-//			logger.info("HTML版邮件已发送至:"+ to);
-//	}
-//	
-//	/**
-//	 * 群发邮件
-//	 * @param to 收件人(多人)
-//	 * @param subject 标题
-//	 * @param text 内容
-//	 * @throws MessagingException 
-//	 */
-//	public void sendMail(String[] to, String subject, String text) throws MessagingException {
-//		MimeMessage msg = mailSender.createMimeMessage();
-//		MimeMessageHelper helper = new MimeMessageHelper(msg, true, DEFAULT_ENCODING);
-//
-//		helper.setTo(to);
-////			helper.setFrom(from);
-//		helper.setSubject(subject);
-//		
-//		helper.setText(text, true);
-//
-//		mailSender.send(msg);
-//	}
+
 	
 	/**
-	 * 发送邮件
+	 * 发送邮件(指定编码)
 	 * @param from 发件人邮箱
 	 * @param fromName 发件人名称
 	 * @param to 收件人
 	 * @param subject 标题
 	 * @param text 内容
 	 * @param encoding 邮件编码
+	 * @param html 是否html页面
 	 * @throws MessagingException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding) throws MessagingException, UnsupportedEncodingException {
+	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, boolean html) throws MessagingException, UnsupportedEncodingException {
 			if(encoding==null||"".equals(encoding)) {
 				encoding = DEFAULT_ENCODING;
 			}
@@ -99,15 +60,29 @@ public class MimeJavaMailSender {
 			helper.setFrom(from, fromName);
 			helper.setSubject(subject);
 			
-//			helper.setText(text, true);//为true-->发送转义HTML
-			helper.setText(text, false);
+			helper.setText(text, html);//为true-->发送转义HTML
 
 			mailSender.send(msg);
-			logger.info("HTML版邮件已发送至:"+ to);
+			logger.debug("邮件已发送至:"+ to);
 	}
 	
 	/**
-	 * 发送邮件
+	 * 发送邮件(指定编码)
+	 * @param from 发件人邮箱
+	 * @param fromName 发件人名称
+	 * @param to 收件人
+	 * @param subject 标题
+	 * @param text 内容
+	 * @param encoding 邮件编码
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding) throws MessagingException, UnsupportedEncodingException {
+		sendMail(from, fromName, to, subject, text, encoding, false);
+	}
+	
+	/**
+	 * 发送邮件(默认utf8编码)
 	 * @param from 发件人邮箱
 	 * @param fromName 发件人名称
 	 * @param to 收件人
@@ -121,16 +96,18 @@ public class MimeJavaMailSender {
 	}
 	
 	/**
-	 * 群发邮件
+	 * 群发邮件(指定编码)
 	 * @param from 发件人邮箱
 	 * @param fromName 发件人名称
 	 * @param to 收件人(多人)
 	 * @param subject 标题
 	 * @param text 内容
+	 * @param encoding 邮件编码
+	 * @param html 是否html页面
 	 * @throws MessagingException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	public void sendMail(String from, String fromName, String[] to, String subject, String text, String encoding) throws MessagingException, UnsupportedEncodingException {
+	public void sendMail(String from, String fromName, String[] to, String subject, String text, String encoding, boolean html) throws MessagingException, UnsupportedEncodingException {
 		if(encoding==null||"".equals(encoding)) {
 			encoding = DEFAULT_ENCODING;
 		}
@@ -141,15 +118,29 @@ public class MimeJavaMailSender {
 		helper.setFrom(from, fromName);
 		helper.setSubject(subject);
 		
-//		helper.setText(text, true);//为true-->发送转义HTML
-		helper.setText(text, false);
+		helper.setText(text, html);//为true-->发送转义HTML
 
 		mailSender.send(msg);
-		logger.info("HTML版邮件已发送至:"+ to);
+		logger.debug("邮件已发送至:"+ to);
 	}
 	
 	/**
-	 * 发送邮件
+	 * 群发邮件(指定编码)
+	 * @param from 发件人邮箱
+	 * @param fromName 发件人名称
+	 * @param to 收件人(多人)
+	 * @param subject 标题
+	 * @param text 内容
+	 * @param encoding 邮件编码
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public void sendMail(String from, String fromName, String[] to, String subject, String text, String encoding) throws MessagingException, UnsupportedEncodingException {
+		sendMail(from, fromName, to, subject, text, encoding, false);
+	}
+	
+	/**
+	 * 发送邮件(默认utf8编码)
 	 * @param from 发件人邮箱
 	 * @param fromName 发件人名称
 	 * @param to 收件人
@@ -163,7 +154,43 @@ public class MimeJavaMailSender {
 	}
 	
 	/**
-	 * 发送带附件邮件
+	 * 发送带附件邮件(指定编码)
+	 * @param from 发件人邮箱
+	 * @param fromName 发件人名称
+	 * @param to 收件人
+	 * @param subject 标题
+	 * @param text 内容
+	 * @param encoding 邮件编码
+	 * @param attachment 附件
+	 * @param html 是否html页面
+	 * @return 发送结果 1:成功  2:构造邮件失败MessagingException 3:收件地址无效 4:其他错误
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, File attachment, boolean html) throws MessagingException, UnsupportedEncodingException {
+		if(encoding==null||"".equals(encoding)) {
+			encoding = DEFAULT_ENCODING;
+		}
+		MimeMessage msg = mailSender.createMimeMessage();
+		MimeMessageHelper helper = new MimeMessageHelper(msg, true, encoding);
+
+		helper.setTo(to);
+		helper.setFrom(from, fromName);
+		helper.setSubject(subject);
+		
+		helper.setText(text, html);//为true-->发送转义HTML
+		
+//		String attachName = MimeUtility.encodeText(attachment.getName());
+//			helper.addInline(attachName, attachment);
+		
+		helper.addAttachment(attachment.getName(), attachment);
+
+		mailSender.send(msg);
+		logger.debug("邮件已发送至:"+ to);
+	}
+	
+	/**
+	 * 发送带附件邮件(指定编码)
 	 * @param from 发件人邮箱
 	 * @param fromName 发件人名称
 	 * @param to 收件人
@@ -176,26 +203,7 @@ public class MimeJavaMailSender {
 	 * @throws UnsupportedEncodingException 
 	 */
 	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, File attachment) throws MessagingException, UnsupportedEncodingException {
-		if(encoding==null||"".equals(encoding)) {
-			encoding = DEFAULT_ENCODING;
-		}
-		MimeMessage msg = mailSender.createMimeMessage();
-		MimeMessageHelper helper = new MimeMessageHelper(msg, true, encoding);
-
-		helper.setTo(to);
-		helper.setFrom(from, fromName);
-		helper.setSubject(subject);
-		
-//		helper.setText(text, true);//为true-->发送转义HTML
-		helper.setText(text, false);
-		
-		String attachName = MimeUtility.encodeText(attachment.getName());
-//			helper.addInline(attachName, attachment);
-		
-		helper.addAttachment(attachment.getName(), attachment);
-
-		mailSender.send(msg);
-		logger.info("HTML版邮件已发送至:"+ to);
+		sendMail(from, fromName, to, subject, text, encoding, attachment, false);
 	}
 	
 	/**
@@ -207,11 +215,13 @@ public class MimeJavaMailSender {
 	 * @param text 内容
 	 * @param encoding 邮件编码
 	 * @param inputStreamSource 附件输入流
+	 * @param attachmentName 附件名称
+	 * @param html 是否html页面
 	 * @return 发送结果 1:成功  2:构造邮件失败MessagingException 3:收件地址无效 4:其他错误
 	 * @throws MessagingException 
 	 * @throws UnsupportedEncodingException 
 	 */
-	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, InputStreamSource inputStreamSource, String attachmentName) throws MessagingException, UnsupportedEncodingException {
+	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, InputStreamSource inputStreamSource, String attachmentName, boolean html) throws MessagingException, UnsupportedEncodingException {
 		if(encoding==null||"".equals(encoding)) {
 			encoding = DEFAULT_ENCODING;
 		}
@@ -222,16 +232,33 @@ public class MimeJavaMailSender {
 		helper.setFrom(from, fromName);
 		helper.setSubject(subject);
 		
-//		helper.setText(text, true);//为true-->发送转义HTML
-		helper.setText(text, false);
+		helper.setText(text, html);//为true-->发送转义HTML
 		
-		String attachName = MimeUtility.encodeText(attachmentName);
+//		String attachName = MimeUtility.encodeText(attachmentName);
 //			helper.addInline(attachName, attachment);
 		
 		helper.addAttachment(attachmentName, inputStreamSource);
 
 		mailSender.send(msg);
-		logger.info("HTML版邮件已发送至:"+ to);
+		logger.debug("邮件已发送至:"+ to);
+	}
+	
+	/**
+	 * 发送带附件邮件
+	 * @param from 发件人邮箱
+	 * @param fromName 发件人名称
+	 * @param to 收件人
+	 * @param subject 标题
+	 * @param text 内容
+	 * @param encoding 邮件编码
+	 * @param attachmentName 附件名称
+	 * @param inputStreamSource 附件输入流
+	 * @return 发送结果 1:成功  2:构造邮件失败MessagingException 3:收件地址无效 4:其他错误
+	 * @throws MessagingException 
+	 * @throws UnsupportedEncodingException 
+	 */
+	public void sendMail(String from, String fromName, String to, String subject, String text, String encoding, InputStreamSource inputStreamSource, String attachmentName) throws MessagingException, UnsupportedEncodingException {
+		sendMail(from, fromName, to, subject, text, encoding, inputStreamSource, attachmentName, false);
 	}
 	
 //	/**
