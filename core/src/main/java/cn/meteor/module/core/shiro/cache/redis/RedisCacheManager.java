@@ -30,9 +30,23 @@ public class RedisCacheManager implements CacheManager {
 	public void setRedisCacheTimeout(long redisCacheTimeout) {
 		this.redisCacheTimeout = redisCacheTimeout;
 	}
+	
+	private long passwordRetryRedisCacheTimeout = 10 * MILLIS_PER_MINUTE;
+
+	public long getPasswordRetryRedisCacheTimeout() {
+		return passwordRetryRedisCacheTimeout;
+	}
+
+	public void setPasswordRetryRedisCacheTimeout(long passwordRetryRedisCacheTimeout) {
+		this.passwordRetryRedisCacheTimeout = passwordRetryRedisCacheTimeout;
+	}
 
 	@Override
 	public <K, V> Cache<K, V> getCache(String name) throws CacheException {
+		if("passwordRetryCache".equals(name)) {
+//			passwordRetryRedisCacheTimeout  = 2 * MILLIS_PER_MINUTE;
+			return new RedisCache<K, V>(name, redisTemplate, passwordRetryRedisCacheTimeout);
+		}
 		return new RedisCache<K, V>(name, redisTemplate, redisCacheTimeout);
 	}
 	
