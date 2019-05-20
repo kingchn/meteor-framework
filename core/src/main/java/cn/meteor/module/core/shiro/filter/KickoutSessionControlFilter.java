@@ -1,5 +1,12 @@
 package cn.meteor.module.core.shiro.filter;
 
+import java.io.Serializable;
+import java.util.Deque;
+import java.util.LinkedList;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+
 import org.apache.shiro.cache.Cache;
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.session.Session;
@@ -9,14 +16,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.apache.shiro.web.util.WebUtils;
 
-import cn.meteor.module.core.shiro.realm.IUserForStore;
 import cn.meteor.module.core.shiro.realm.User;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import java.io.Serializable;
-import java.util.Deque;
-import java.util.LinkedList;
 
 public class KickoutSessionControlFilter extends AccessControlFilter {
 
@@ -75,7 +75,6 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
         Deque<Serializable> deque = cache.get(userKey);
         if(deque == null) {
             deque = new LinkedList<Serializable>();
-            cache.put(userKey, deque);
         }
 
         //如果队列里没有此sessionId，且用户没有被踢出；放入队列
@@ -100,6 +99,8 @@ public class KickoutSessionControlFilter extends AccessControlFilter {
             } catch (Exception e) {//ignore exception
             }
         }
+
+        cache.put(userKey, deque);
 
         //如果被踢出了，直接退出，重定向到踢出后的地址
         if (session.getAttribute("kickout") != null) {
