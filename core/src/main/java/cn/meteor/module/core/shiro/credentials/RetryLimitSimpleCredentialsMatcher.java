@@ -28,7 +28,7 @@ public class RetryLimitSimpleCredentialsMatcher extends SimpleCredentialsMatcher
         AtomicInteger retryCount = passwordRetryCache.get(username);
         if(retryCount == null) {
             retryCount = new AtomicInteger(0);
-            passwordRetryCache.put(username, retryCount);
+//            passwordRetryCache.put(username, retryCount);
         }
         if(retryCount.incrementAndGet() > 5) {
             //if retry count > 5 throw
@@ -40,6 +40,8 @@ public class RetryLimitSimpleCredentialsMatcher extends SimpleCredentialsMatcher
         if(matches) {
             //clear retry count
             passwordRetryCache.remove(username);
+        } else{
+        	passwordRetryCache.put(username, retryCount);
         }
         return matches;
     }
