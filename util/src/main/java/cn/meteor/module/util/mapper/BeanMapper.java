@@ -1,5 +1,6 @@
 package cn.meteor.module.util.mapper;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -26,13 +27,15 @@ public class BeanMapper {
 
 	private static MapperFacade mapper;
 	
-	private static DozerBeanMapper dozerBeanMapper;
+	private static DozerBeanMapper dozerBeanMapper;	
 
-	static {
+
+	static {			    
 		MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
-		mapper = mapperFactory.getMapperFacade();
+		mapper = mapperFactory.getMapperFacade();		
 		
 		dozerBeanMapper = new DozerBeanMapper();
+		dozerBeanMapper.setMappingFiles(Arrays.asList("dozer/dozer-global-configuration.xml"));//yyyy-MM-dd'T'HH:mm:ss.SSS
 	}
 	
 
@@ -81,6 +84,17 @@ public class BeanMapper {
 	public static <S, D> D map(S source, Class<D> destinationClass) {
 		return mapper.map(source, destinationClass);
 	}
+	
+	/**
+	 * 简单的复制出新类型对象.(支持自定义map)
+	 * 
+	 * 通过source.getClass() 获得源Class
+	 */
+	public static <S, D> D customMap(S source, Class<S> sourceClass, Class<D> destinationClass, Map<String, String> customMap) {
+		BeanMapper beanMapper = new BeanMapper();   
+		MapperFacade mapper = beanMapper.getCustomMapperFacade(sourceClass, destinationClass, customMap);
+		return mapper.map(source, destinationClass);
+	}
 
 	/**
 	 * 极致性能的复制出新类型对象.
@@ -97,6 +111,17 @@ public class BeanMapper {
 	 * 不建议使用mapper.mapAsList(Iterable<S>,Class<D>)接口, sourceClass需要反射，实在有点慢
 	 */
 	public static <S, D> List<D> mapList(Iterable<S> sourceList, Class<S> sourceClass, Class<D> destinationClass) {
+		return mapper.mapAsList(sourceList, TypeFactory.valueOf(sourceClass), TypeFactory.valueOf(destinationClass));
+	}
+	
+	/**
+	 * 简单的复制出新对象列表到ArrayList(支持自定义map)
+	 * 
+	 * 不建议使用mapper.mapAsList(Iterable<S>,Class<D>)接口, sourceClass需要反射，实在有点慢
+	 */
+	public static <S, D> List<D> customMapList(Iterable<S> sourceList, Class<S> sourceClass, Class<D> destinationClass, Map<String, String> customMap) {
+		BeanMapper beanMapper = new BeanMapper();   
+		MapperFacade mapper = beanMapper.getCustomMapperFacade(sourceClass, destinationClass, customMap);
 		return mapper.mapAsList(sourceList, TypeFactory.valueOf(sourceClass), TypeFactory.valueOf(destinationClass));
 	}
 
