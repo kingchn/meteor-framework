@@ -67,6 +67,14 @@
         	<ref bean="mappingJackson2HttpMessageConverter" />
         	<ref bean="mappingJackson2XmlHttpMessageConverter" />
   		</mvc:message-converters> -->
+  		<mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper" ref="objectMapperForJson"/>
+            </bean>
+            <bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter">
+                <property name="objectMapper" ref="objectMapperForXml"/>
+            </bean>
+        </mvc:message-converters>
   		<mvc:argument-resolvers>
   			<bean class="cn.meteor.module.core.openApi.handler.RestRequestResponseBodyMethodProcessor"><!-- 提供支持RestRequestBody注解 -->
             	<constructor-arg ref="messageConverters" />
