@@ -1,12 +1,18 @@
 package cn.meteor.module.util.mapper;
 
+import java.io.ByteArrayInputStream;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.dozer.DozerBeanMapper;
 import org.dozer.MappingException;
+import org.dozer.loader.api.BeanMappingBuilder;
+import org.dozer.loader.api.TypeMappingOptions;
+import org.dozer.metadata.MappingMetadata;
 
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MapperFactory;
@@ -27,7 +33,25 @@ public class BeanMapper {
 
 	private static MapperFacade mapper;
 	
-	private static DozerBeanMapper dozerBeanMapper;	
+	private static DozerBeanMapper dozerBeanMapper;
+
+	public static String PLACEHODER_DATEFORMAT = "${dateFormat}"; 
+	
+	public static String configurationXml =
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<mappings xmlns=\"http://dozer.sourceforge.net\"\n" +
+                    "          xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                    "          xsi:schemaLocation=\"http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd\">\n" +
+                    "  <configuration>\n" +
+                    "    <date-format>" + PLACEHODER_DATEFORMAT  + "</date-format>\n" +
+                    "  </configuration>\n" +
+                    "</mappings>";
+	
+	
+	public static String getConfirurationXmlString(String dateFormat) {
+		String configurationXmlString = configurationXml.replace(PLACEHODER_DATEFORMAT, dateFormat);
+		return configurationXmlString;
+	}
 
 
 	static {			    
@@ -35,7 +59,14 @@ public class BeanMapper {
 		mapper = mapperFactory.getMapperFacade();		
 		
 		dozerBeanMapper = new DozerBeanMapper();
-		dozerBeanMapper.setMappingFiles(Arrays.asList("dozer/dozer-global-configuration.xml"));//yyyy-MM-dd'T'HH:mm:ss.SSS
+//		dozerBeanMapper.setMappingFiles(Arrays.asList("dozer/dozer-global-configuration.xml"));//yyyy-MM-dd'T'HH:mm:ss.SSS
+		
+		String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+		String configurationXmlString = getConfirurationXmlString(dateFormat);
+		dozerBeanMapper.addMapping(new ByteArrayInputStream(configurationXmlString.getBytes()));
+		
+		
+		
 	}
 	
 
