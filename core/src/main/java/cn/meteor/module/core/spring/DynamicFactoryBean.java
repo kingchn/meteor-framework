@@ -64,7 +64,7 @@ public class DynamicFactoryBean<T> implements FactoryBean<T>, InitializingBean {
 			}
 		} catch (Exception e) {
 //			logger.error("调用init出错",e);
-			logger.debug("执行" + getClass().getName() + "的afterPropertiesSet()时异常: " + e.toString());
+			logger.error("执行" + getClass().getName() + "的afterPropertiesSet()时异常: " + e);
 		}
 	}
 	

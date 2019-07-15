@@ -122,7 +122,7 @@ public class MyFreeMarkerView extends FreeMarkerView {
 	
 	
 	public Result createHTML(Template template, SimpleHash model, HttpServletRequest request,  
-            HttpServletResponse response, String targetFilePath, String targetFilename) throws IOException  {
+            HttpServletResponse response, String targetFilePath, String targetFilename) throws IOException {
 		Result result = new Result();
 		File file = new File(targetFilePath);
         if(!file.exists()){
