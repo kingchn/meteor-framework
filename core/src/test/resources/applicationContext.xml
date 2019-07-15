@@ -15,7 +15,7 @@
 		<property name="locations">
 			<list>
 				<!-- 标准配置 -->
-				<value>classpath*:/email-gmail.properties</value>
+				<value>classpath*:/email-foresee.properties</value>
 			</list>
 		</property>
 	</bean>
