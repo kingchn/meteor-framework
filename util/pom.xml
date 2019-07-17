@@ -48,7 +48,8 @@
 		<commons-beanutils.version>1.8.3</commons-beanutils.version>
 		<poi.version>3.15</poi.version>
 		<orika.version>1.5.1</orika.version>
-		<dozer.version>5.5.1</dozer.version>
+		<!-- <dozer.version>5.5.1</dozer.version> -->
+		<dozer.github.version>6.5.0</dozer.github.version>
 		<zxing.version>3.3.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 -->
 		<junit.version>4.12</junit.version>
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
@@ -129,13 +130,20 @@
 			<artifactId>orika-core</artifactId>
 			<version>${orika.version}</version>
 			<!-- <optional>true</optional> -->
-		</dependency>		
+		</dependency>
 		
-		<dependency>
+		<!-- <dependency>
 		    <groupId>net.sf.dozer</groupId>
 		    <artifactId>dozer</artifactId>
 		    <version>${dozer.version}</version>
+		</dependency> -->
+		
+		<dependency>
+		    <groupId>com.github.dozermapper</groupId>
+		    <artifactId>dozer-core</artifactId>
+		    <version>${dozer.github.version}</version>
 		</dependency>
+		
 		<!-- bean mapper end -->
 		
 		<!-- qrcode start -->
