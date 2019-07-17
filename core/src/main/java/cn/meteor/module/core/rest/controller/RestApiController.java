@@ -1,7 +1,7 @@
 package cn.meteor.module.core.rest.controller;
 
-import java.io.ByteArrayInputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -16,7 +16,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.dozer.DozerBeanMapper;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -32,8 +31,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import cn.meteor.module.core.rest.annotation.RestClass;
 import cn.meteor.module.core.rest.annotation.RestMethod;
@@ -41,7 +43,6 @@ import cn.meteor.module.core.rest.exception.ErrorMsgUtils;
 import cn.meteor.module.core.rest.exception.ErrorType;
 import cn.meteor.module.core.rest.request.RestCommonRequest;
 import cn.meteor.module.core.rest.response.RestCommonResponse;
-import cn.meteor.module.util.mapper.BeanMapper;
 
 @RequestMapping("${core.rest.rootPath}")
 @RestController
@@ -70,6 +71,8 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	 */
 	private Map<String, RestMethod> restMethodAnnotationMap = new HashMap<>();
 	
+	private ObjectMapper objectMapper = new ObjectMapper();
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		
@@ -78,9 +81,13 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 			System.exit(-1);
 		}
 		
+		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);	//忽略未知字段   
+		objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);			//兼容字段名没双引号包围
+		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);//只显示非空字段
+		
 		AnnotatedTypeScanner s = new AnnotatedTypeScanner(RestClass.class);
 		Set<Class<?>> clzSet = s.findTypes(basePackages);
-		for(Class<?> clz : clzSet) {			
+		for(Class<?> clz : clzSet) {
 			RestClass restClass = clz.getAnnotation(RestClass.class);
 			if(restClass != null){
 				String restClassValue = restClass.value();
@@ -173,32 +180,41 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 //							Class<? extends Type> clz = m.getGenericParameterTypes()[0].getClass();
 //							param = JSON.parseArray(restCommonRequestBodyContent, clz);
 							//TODO:
-						} else {
-							ObjectMapper objectMapper = new ObjectMapper();
-							objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);//忽略未知字段
-							objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);//只显示非空字段
-							
-							Class<?>[] parameterTypes =m.getParameterTypes();
-							param = objectMapper.readValue(bodyJson, parameterTypes[0]);
+						} else {							
+							//获取参数类型
+//							Class<?>[] parameterTypes =m.getParameterTypes();
+							Type[] typeArr =m.getGenericParameterTypes();
+							Type type = typeArr[0];
+							JavaType javaType = TypeFactory.defaultInstance().constructType(type);
+							param = objectMapper.readValue(bodyJson, javaType);
 						}
 					}
 				} else {//默认json对象（明文）
 					if( !(restCommonRequest.getBody() instanceof LinkedHashMap) ) {//如果不是LinkedHashMap，即body节点的报文不是json对象结构数据的情况
 						ErrorMsgUtils.throwIsvException(ErrorType.INVALID_REQUEST_BODY_DATA_FORMAT, new Object[] { "body不是json对象结构数据" });
 					}
-					Class<?>[] parameterTypes =m.getParameterTypes();
 					
-					String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-					if(StringUtils.isNotBlank(restCommonRequest.getDf())) {
-						dateFormat = restCommonRequest.getDf();
-						String configurationXmlString = BeanMapper.getConfirurationXmlString(dateFormat);
-						
-						DozerBeanMapper dozerBeanMapper = new DozerBeanMapper();
-						dozerBeanMapper.addMapping(new ByteArrayInputStream(configurationXmlString.getBytes()));
-						param = dozerBeanMapper.map(restCommonRequest.getBody(), parameterTypes[0]);
-					} else {
-						param = BeanMapper.mapWithDozer(restCommonRequest.getBody(), parameterTypes[0]);
-					}
+					//获取参数类型
+//					Class<?>[] parameterTypes =m.getParameterTypes();
+					Type[] typeArr =m.getGenericParameterTypes();
+					Type type = typeArr[0];
+					JavaType javaType = TypeFactory.defaultInstance().constructType(type);
+					
+					//将body转为json，再将json转为对象赋值给param
+					byte[] jsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
+					param = objectMapper.readValue(jsonBytes, javaType);
+					
+//					String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
+//					if(StringUtils.isNotBlank(restCommonRequest.getDf())) {
+//						dateFormat = restCommonRequest.getDf();
+//						String configurationXmlString = BeanMapper.getConfirurationXmlString(dateFormat);
+//						
+//						DozerBeanMapper dozerBeanMapper = new DozerBeanMapper();
+//						dozerBeanMapper.addMapping(new ByteArrayInputStream(configurationXmlString.getBytes()));
+//						param = dozerBeanMapper.map(restCommonRequest.getBody(), parameterTypes[0]);
+//					} else {
+//						param = BeanMapper.mapWithDozer(restCommonRequest.getBody(), parameterTypes[0]);
+//					}
 				}
 			}
 			
