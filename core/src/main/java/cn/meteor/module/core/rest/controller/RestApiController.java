@@ -159,7 +159,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	
 		if (cls == null || cls.length == 0) {
 			result = m.invoke(service);
-		} else {			
+		} else {
 			Class<?> paramClazz = m.getParameterTypes()[0];
 			Object param = null;
 			
@@ -204,59 +204,49 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 					byte[] jsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
 					param = objectMapper.readValue(jsonBytes, javaType);
 					
-//					String dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS";
-//					if(StringUtils.isNotBlank(restCommonRequest.getDf())) {
-//						dateFormat = restCommonRequest.getDf();
-//						String configurationXmlString = BeanMapper.getConfirurationXmlString(dateFormat);
-//						
-//						DozerBeanMapper dozerBeanMapper = new DozerBeanMapper();
-//						dozerBeanMapper.addMapping(new ByteArrayInputStream(configurationXmlString.getBytes()));
-//						param = dozerBeanMapper.map(restCommonRequest.getBody(), parameterTypes[0]);
-//					} else {
-//						param = BeanMapper.mapWithDozer(restCommonRequest.getBody(), parameterTypes[0]);
-//					}
+
 				}
 			}
 			
 			//校验业务请求实体
-			if( param !=null)
+			if(param !=null)
 				validBusinessRequest(param);
 			
 			//执行业务接口
 			result = m.invoke(service, param);
-			
-			String responseBodyFormat = restMethod.responseBodyFormat();
-			if("".contentEquals(restMethod.responseBodyFormat())) {//如果responseBodyFormat没设置值，则使用requestBodyFormat的值
-				responseBodyFormat = restCommonRequest.getRequestBodyFormat();
-			}
-			
-			if("json".equals(responseBodyFormat)) {
-				restCommonResponse.setBody(result);
-			} else {
-				if(result instanceof byte[]) {
-					byte[] bytes = (byte[]) result;
-					String contentBase64 =Base64.encodeBase64String(bytes);
-					restCommonResponse.setBody(contentBase64);
-				} else {
-					ObjectMapper objectMapper = new ObjectMapper();
-					objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);//只显示非空字段
-					String contentJson = objectMapper.writeValueAsString(result);
-					String contentBase64 =Base64.encodeBase64String(contentJson.getBytes());
-					restCommonResponse.setBody(contentBase64);
-				}
-			}
-			
-			restCommonResponse.setCode("1");
-			restCommonResponse.setMsg("success");
-			restCommonResponse.setResponseBodyFormat(responseBodyFormat);
-			if("base64".equals(restCommonResponse.getResponseBodyFormat())) {//如果是默认的base64，则返回null，表示默认值，即base64
-				restCommonResponse.setResponseBodyFormat(null);
-			}
-			restCommonResponse.setTimestamp((new Date()).getTime());
-			
 		}
 		
+		//响应处理
+		//响应的body的格式： json、base64；如果没指定响应的body的格式，则使用请求中指定的；请求中指定的格式默认为base64
+		String responseBodyFormat = restMethod.responseBodyFormat();
+		if("".contentEquals(restMethod.responseBodyFormat())) {//如果responseBodyFormat没设置值，则使用requestBodyFormat的值
+			responseBodyFormat = restCommonRequest.getRequestBodyFormat();
+		}
 		
+		if("json".equals(responseBodyFormat)) {
+			restCommonResponse.setBody(result);
+		} else {
+			if(result instanceof byte[]) {
+				byte[] bytes = (byte[]) result;
+				String contentBase64 =Base64.encodeBase64String(bytes);
+				restCommonResponse.setBody(contentBase64);
+			} else {
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);//只显示非空字段
+				String contentJson = objectMapper.writeValueAsString(result);
+				String contentBase64 =Base64.encodeBase64String(contentJson.getBytes());
+				restCommonResponse.setBody(contentBase64);
+			}
+		}
+		
+		restCommonResponse.setCode("1");
+		restCommonResponse.setMsg("success");
+		restCommonResponse.setResponseBodyFormat(responseBodyFormat);
+		if("base64".equals(restCommonResponse.getResponseBodyFormat())) {//如果是默认的base64，则返回null，表示默认值，即base64
+			restCommonResponse.setResponseBodyFormat(null);
+		}
+		restCommonResponse.setTimestamp((new Date()).getTime());
+				
 		return restCommonResponse;
 	}
 	
