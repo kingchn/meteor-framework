@@ -8,18 +8,19 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
+import cn.meteor.module.core.shiro.api.IShiro;
 import cn.meteor.module.core.shiro.authc.SimpleSaltedAuthenticationInfo;
 
 public class UserRealm extends AuthorizingRealm {
 	
-	private IUserForStore iUserForStore;
+	private IShiro iShiro;
 
-    public IUserForStore getiUserForStore() {
-		return iUserForStore;
+	public IShiro getiShiro() {
+		return iShiro;
 	}
 
-	public void setiUserForStore(IUserForStore iUserForStore) {
-		this.iUserForStore = iUserForStore;
+	public void setiShiro(IShiro iShiro) {
+		this.iShiro = iShiro;
 	}
 
 	@Override
@@ -33,14 +34,14 @@ public class UserRealm extends AuthorizingRealm {
         SimpleAuthorizationInfo authorizationInfo = new SimpleAuthorizationInfo();
 //        authorizationInfo.setRoles(userService.findRoles(username));
 //        authorizationInfo.setStringPermissions(userService.findPermissions(username));
-        authorizationInfo.setStringPermissions(iUserForStore.getStringPermissionsByUserId(userid));
+        authorizationInfo.setStringPermissions(iShiro.getStringPermissionsByUserId(userid));
         return authorizationInfo;
     }
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         String principal = (String)token.getPrincipal();	//username
-        User user = iUserForStore.getByUsername(principal);
+        User user = iShiro.getByUsername(principal);
 //      if(memberUser == null) {
 //      throw new UnknownAccountException();//没找到帐号
 //  }
