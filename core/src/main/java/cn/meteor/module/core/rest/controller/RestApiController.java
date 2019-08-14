@@ -16,6 +16,9 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.shiro.authz.UnauthorizedException;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.apache.shiro.authz.aop.PermissionAnnotationMethodInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -71,6 +74,11 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	 */
 	private Map<String, RestMethod> restMethodAnnotationMap = new HashMap<>();
 	
+	/**
+	 * 方法map，key RestClass注解的值 + "." + RestMethod注解的值；value RequiresPermissions注解
+	 */
+	private Map<String, RequiresPermissions> requiresPermissionsAnnotationMap = new HashMap<>();
+	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
 	@Override
@@ -105,6 +113,12 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 						}
 						methodMap.put(restMethodValue, m);
 						restMethodAnnotationMap.put(restMethodValue, restMethod);
+						
+						//初始化requiresPermissionsAnnotationMap数据
+						RequiresPermissions requiresPermissions = m.getAnnotation(RequiresPermissions.class);
+						if(requiresPermissions != null) {
+							requiresPermissionsAnnotationMap.put(restMethodValue, requiresPermissions);
+						}
 					}
 				}
 			}			
@@ -130,8 +144,8 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	@RequestMapping(value="")
 	@ResponseBody
 	public RestCommonResponse doService(@Valid @RequestBody RestCommonRequest restCommonRequest) throws Exception {
-		RestCommonResponse restCommonResponse = new RestCommonResponse();		
-		
+		RestCommonResponse restCommonResponse = new RestCommonResponse();
+//		PermissionAnnotationMethodInterceptor
 		String methodString=restCommonRequest.getServiceId();
 		String[] strs = methodString.split("[.]");//第一点之前是类 ；后面的都是方法名
 		String className = strs[0];
@@ -152,6 +166,13 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		if(m==null) {//找不到这个方法，说明serviceId不正确
 			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_SERVICE_ID);
 		}
+		
+		RequiresPermissions requiresPermissions = requiresPermissionsAnnotationMap.get(methodKey);
+		
+		
+		AuthorizingUtils.assertAuthorized(requiresPermissions);
+		
+		
 		RestMethod restMethod = restMethodAnnotationMap.get(methodKey);
 		
 		Class<?>[] cls = m.getParameterTypes();

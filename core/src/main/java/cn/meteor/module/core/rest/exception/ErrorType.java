@@ -7,6 +7,7 @@ public enum ErrorType {
 	PARAMETER_ERROR,
 	
 	INVALID_PARAM_SERVICE_ID,	//无效serviceId
+	INSUFFICIENT_USER_PERMISSIONS,	//用户权限不足
 	INVALID_PARAM_REQUEST_BODY_FORMAT,	//参数指定无效请求体数据格式
 	INVALID_REQUEST_MAIN_DATA_FORMAT,		//完整请求报文数据格式不正确
 	INVALID_REQUEST_BODY_DATA_FORMAT,	//请求实体body报文数据格式不正确
@@ -27,5 +28,6 @@ public enum ErrorType {
     ISV_PARAMETER_BLANK,
     ISV_INVALID_PARAMETER,
     ISV_REQUEST_DATA_PARSE_ERROR,	//请求数据解析错误
+    ISV_INVALID_PERMISSION,	//权限不够、非法访问
     
 }
