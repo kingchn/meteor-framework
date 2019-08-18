@@ -1,6 +1,7 @@
 package cn.meteor.module.core.rest.controller;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.HashMap;
@@ -16,9 +17,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.shiro.authz.UnauthorizedException;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.apache.shiro.authz.aop.PermissionAnnotationMethodInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -44,6 +43,7 @@ import cn.meteor.module.core.rest.annotation.RestClass;
 import cn.meteor.module.core.rest.annotation.RestMethod;
 import cn.meteor.module.core.rest.exception.ErrorMsgUtils;
 import cn.meteor.module.core.rest.exception.ErrorType;
+import cn.meteor.module.core.rest.request.RestBodyRequest;
 import cn.meteor.module.core.rest.request.RestCommonRequest;
 import cn.meteor.module.core.rest.response.RestCommonResponse;
 
@@ -211,21 +211,39 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 						}
 					}
 				} else {//默认json对象（明文）
-					if( !(restCommonRequest.getBody() instanceof LinkedHashMap) ) {//如果不是LinkedHashMap，即body节点的报文不是json对象结构数据的情况
-						ErrorMsgUtils.throwIsvException(ErrorType.INVALID_REQUEST_BODY_DATA_FORMAT, new Object[] { "body不是json对象结构数据" });
-					}
+//					if( !(restCommonRequest.getBody() instanceof LinkedHashMap) ) {//如果不是LinkedHashMap，即body节点的报文不是json对象结构数据的情况
+//						ErrorMsgUtils.throwIsvException(ErrorType.INVALID_REQUEST_BODY_DATA_FORMAT, new Object[] { "body不是json对象结构数据" });
+//					}
 					
 					//获取参数类型
 //					Class<?>[] parameterTypes =m.getParameterTypes();
-					Type[] typeArr =m.getGenericParameterTypes();
+					Type[] typeArr = m.getGenericParameterTypes();
 					Type type = typeArr[0];
-					JavaType javaType = TypeFactory.defaultInstance().constructType(type);
 					
 					//将body转为json，再将json转为对象赋值给param
 					byte[] jsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
-					param = objectMapper.readValue(jsonBytes, javaType);
 					
-
+					boolean isRestBodyRequest = false;
+					//判断是否参数类型是RestBodyRequest<T>，并做相应处理(如果是，则json直接反序列化到RestBodyRequest<T>的data字段)
+					if (type instanceof ParameterizedType) {
+						ParameterizedType pt = (ParameterizedType) type;
+						Type rawType = pt.getRawType();
+						Type[] actualTypeArr = pt.getActualTypeArguments();
+						Type actualType = actualTypeArr[0];
+						if(rawType.getTypeName().equals(RestBodyRequest.class.getCanonicalName())) {//参数类型是RestBodyRequest<T>
+							isRestBodyRequest = true;
+							JavaType actualJavaType = TypeFactory.defaultInstance().constructType(actualType);//RestBodyRequest<T>的T的JavaType
+							Object data = objectMapper.readValue(jsonBytes, actualJavaType);
+							RestBodyRequest restBodyRequest = new RestBodyRequest();
+							restBodyRequest.setData(data);
+							param = restBodyRequest;
+						}
+					}
+					
+					if(isRestBodyRequest == false) {//如果参数类型不是RestBodyRequest<T>，则按一般处理，json反序列化对应整个RestBodyRequest<T>
+						JavaType javaType = TypeFactory.defaultInstance().constructType(type);					
+						param = objectMapper.readValue(jsonBytes, javaType);
+					}
 				}
 			}
 			
