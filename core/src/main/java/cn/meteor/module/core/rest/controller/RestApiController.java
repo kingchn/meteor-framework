@@ -195,6 +195,8 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 			if(restCommonRequest.getBody()!=null) {//_reqBodyFormat 为base64
 				if("base64".equals(restCommonRequest.getRequestBodyFormat())) {
 					String bodyJsonBase64 = "" + restCommonRequest.getBody();
+					
+					boolean isRestBodyRequest = false;
 					if(StringUtils.isNotBlank(bodyJsonBase64)) {
 						String bodyJson = new String(Base64.decodeBase64(bodyJsonBase64));
 						if (paramClazz.isAssignableFrom(List.class)) {
@@ -206,8 +208,27 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 //							Class<?>[] parameterTypes =m.getParameterTypes();
 							Type[] typeArr =m.getGenericParameterTypes();
 							Type type = typeArr[0];
-							JavaType javaType = TypeFactory.defaultInstance().constructType(type);
-							param = objectMapper.readValue(bodyJson, javaType);
+							
+							//判断是否参数类型是RestBodyRequest<T>，并做相应处理(如果是，则json直接反序列化到RestBodyRequest<T>的data字段)
+							if (type instanceof ParameterizedType) {
+								ParameterizedType pt = (ParameterizedType) type;
+								Type rawType = pt.getRawType();
+								Type[] actualTypeArr = pt.getActualTypeArguments();
+								Type actualType = actualTypeArr[0];
+								if(rawType.getTypeName().equals(RestBodyRequest.class.getCanonicalName())) {//参数类型是RestBodyRequest<T>
+									isRestBodyRequest = true;
+									JavaType actualJavaType = TypeFactory.defaultInstance().constructType(actualType);//RestBodyRequest<T>的T的JavaType
+									Object data = objectMapper.readValue(bodyJson, actualJavaType);
+									RestBodyRequest restBodyRequest = new RestBodyRequest();
+									restBodyRequest.setData(data);
+									param = restBodyRequest;
+								}
+							}
+							
+							if (isRestBodyRequest == false) {// 如果参数类型不是RestBodyRequest<T>，则按一般处理，json反序列化对应整个RestBodyRequest<T>
+								JavaType javaType = TypeFactory.defaultInstance().constructType(type);
+								param = objectMapper.readValue(bodyJson, javaType);
+							}
 						}
 					}
 				} else {//默认json对象（明文）
@@ -221,7 +242,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 					Type type = typeArr[0];
 					
 					//将body转为json，再将json转为对象赋值给param
-					byte[] jsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
+					byte[] bodyJsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
 					
 					boolean isRestBodyRequest = false;
 					//判断是否参数类型是RestBodyRequest<T>，并做相应处理(如果是，则json直接反序列化到RestBodyRequest<T>的data字段)
@@ -233,7 +254,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 						if(rawType.getTypeName().equals(RestBodyRequest.class.getCanonicalName())) {//参数类型是RestBodyRequest<T>
 							isRestBodyRequest = true;
 							JavaType actualJavaType = TypeFactory.defaultInstance().constructType(actualType);//RestBodyRequest<T>的T的JavaType
-							Object data = objectMapper.readValue(jsonBytes, actualJavaType);
+							Object data = objectMapper.readValue(bodyJsonBytes, actualJavaType);
 							RestBodyRequest restBodyRequest = new RestBodyRequest();
 							restBodyRequest.setData(data);
 							param = restBodyRequest;
@@ -242,7 +263,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 					
 					if(isRestBodyRequest == false) {//如果参数类型不是RestBodyRequest<T>，则按一般处理，json反序列化对应整个RestBodyRequest<T>
 						JavaType javaType = TypeFactory.defaultInstance().constructType(type);					
-						param = objectMapper.readValue(jsonBytes, javaType);
+						param = objectMapper.readValue(bodyJsonBytes, javaType);
 					}
 				}
 			}
