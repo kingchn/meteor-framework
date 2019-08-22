@@ -22,6 +22,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.AnnotatedTypeScanner;
 import org.springframework.validation.BindException;
@@ -39,6 +40,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import cn.meteor.module.core.openApi.secret.AppSecretManager;
 import cn.meteor.module.core.rest.annotation.RestClass;
 import cn.meteor.module.core.rest.annotation.RestMethod;
 import cn.meteor.module.core.rest.exception.ErrorMsgUtils;
@@ -46,6 +48,7 @@ import cn.meteor.module.core.rest.exception.ErrorType;
 import cn.meteor.module.core.rest.request.RestBodyRequest;
 import cn.meteor.module.core.rest.request.RestCommonRequest;
 import cn.meteor.module.core.rest.response.RestCommonResponse;
+import cn.meteor.module.core.rest.utils.RestSignUtils;
 
 @RequestMapping("${core.rest.rootPath}")
 @RestController
@@ -58,6 +61,9 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	
 	@Value("${core.rest.basePackages}")
 	private String basePackages;
+	
+	@Autowired
+	private AppSecretManager appSecretManager;
 
 	/**
 	 * 类map，key RestClass注解的值；value 扫描得到的Class
@@ -140,6 +146,45 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 			throw bindException;
 		}		
 	}
+	
+	/**
+	 * 验证请求签名
+	 * @param restCommonRequest
+	 */
+	protected <T> void validRequestSign(RestCommonRequest restCommonRequest, String requestBodyString) {
+		String appKey =  restCommonRequest.getAppKey();
+		String appSecret = null;
+		if(appSecretManager.isContainAppKey(appKey)) {
+			appSecret = appSecretManager.getSecret(appKey);
+		} else {//appKey 无效
+			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_APP_KEY);
+		}
+		String requestSignString = restCommonRequest.getSign();
+		String serverSignString = RestSignUtils.getSign(restCommonRequest, requestBodyString, appSecret);
+		logger.debug("requestSign:" + requestSignString);
+		logger.debug("serverSign:" + serverSignString);
+		if(!requestSignString.equals(serverSignString)) {//无效签名
+			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_SIGNATURE);
+		}
+	}
+	
+	private String getRequestBodyString(RestCommonRequest restCommonRequest) throws Exception {
+		String requestBodyString = null;
+		String requestBodyFormat = restCommonRequest.getRequestBodyFormat();
+		if(requestBodyFormat!=null) {
+			if(!"base64".equals(requestBodyFormat) && !"json".equals(requestBodyFormat)) {//requestBodyFormat格式不在支持的格式范围内
+				ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_REQUEST_BODY_FORMAT);
+			}
+		}
+		if(restCommonRequest.getBody()!=null) {
+			if("base64".equals(restCommonRequest.getRequestBodyFormat())) {
+				requestBodyString = "" + restCommonRequest.getBody();
+			} else {//默认json对象（明文）
+				requestBodyString = objectMapper.writeValueAsString(restCommonRequest.getBody());
+			}
+		}
+		return requestBodyString;
+	}
 
 	@RequestMapping(value="")
 	@ResponseBody
@@ -175,6 +220,12 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		
 		RestMethod restMethod = restMethodAnnotationMap.get(methodKey);
 		
+		//获取请求报文中body的原始字符串。base64则为base64字符串；json则为json字符串
+		String requestBodyString = getRequestBodyString(restCommonRequest);
+		
+		//验证请求签名
+		validRequestSign(restCommonRequest, requestBodyString);
+		
 		Class<?>[] cls = m.getParameterTypes();
 		Object result = null;
 	
@@ -184,17 +235,10 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 			Class<?> paramClazz = m.getParameterTypes()[0];
 			Object param = null;
 			
-			String requestBodyFormat = restCommonRequest.getRequestBodyFormat();
-			if(requestBodyFormat!=null) {
-				if(!"base64".equals(requestBodyFormat) && !"json".equals(requestBodyFormat)) {//requestBodyFormat格式不在支持的格式范围内
-					ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_REQUEST_BODY_FORMAT);
-				}
-			}
-			
 			//根据请求参数body的格式类型，通过请求body的数据转化来设置param的值
 			if(restCommonRequest.getBody()!=null) {//_reqBodyFormat 为base64
 				if("base64".equals(restCommonRequest.getRequestBodyFormat())) {
-					String bodyJsonBase64 = "" + restCommonRequest.getBody();
+					String bodyJsonBase64 = requestBodyString;
 					
 					boolean isRestBodyRequest = false;
 					if(StringUtils.isNotBlank(bodyJsonBase64)) {
@@ -242,7 +286,9 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 					Type type = typeArr[0];
 					
 					//将body转为json，再将json转为对象赋值给param
-					byte[] bodyJsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
+//					byte[] bodyJsonBytes = objectMapper.writeValueAsBytes(restCommonRequest.getBody());
+//					String bodyJsonString = objectMapper.writeValueAsString(restCommonRequest.getBody());
+					String bodyJsonString = requestBodyString;
 					
 					boolean isRestBodyRequest = false;
 					//判断是否参数类型是RestBodyRequest<T>，并做相应处理(如果是，则json直接反序列化到RestBodyRequest<T>的data字段)
@@ -254,7 +300,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 						if(rawType.getTypeName().equals(RestBodyRequest.class.getCanonicalName())) {//参数类型是RestBodyRequest<T>
 							isRestBodyRequest = true;
 							JavaType actualJavaType = TypeFactory.defaultInstance().constructType(actualType);//RestBodyRequest<T>的T的JavaType
-							Object data = objectMapper.readValue(bodyJsonBytes, actualJavaType);
+							Object data = objectMapper.readValue(bodyJsonString, actualJavaType);
 							RestBodyRequest restBodyRequest = new RestBodyRequest();
 							restBodyRequest.setData(data);
 							param = restBodyRequest;
@@ -263,7 +309,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 					
 					if(isRestBodyRequest == false) {//如果参数类型不是RestBodyRequest<T>，则按一般处理，json反序列化对应整个RestBodyRequest<T>
 						JavaType javaType = TypeFactory.defaultInstance().constructType(type);					
-						param = objectMapper.readValue(bodyJsonBytes, javaType);
+						param = objectMapper.readValue(bodyJsonString, javaType);
 					}
 				}
 			}

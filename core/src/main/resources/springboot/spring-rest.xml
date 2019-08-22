@@ -41,4 +41,11 @@
 	    <property name="validator" ref="validator"/>  
 	</bean>
 	
+	
+	<bean id="fileBaseAppSecretManager"  class="cn.meteor.module.core.rest.secret.impl.FileBaseAppSecretManager">
+		<property name="propertiesFilePath" value="${core.rest.fileBaseAppSecretManager.propertiesFilePath:rest/appSecret.properties}"  />
+	</bean>
+	
+	<alias alias="appSecretManager" name="${core.rest.appSecretManager.beanName:fileBaseAppSecretManager}"  />
+	
 </beans>

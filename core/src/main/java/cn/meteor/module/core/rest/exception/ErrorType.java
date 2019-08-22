@@ -7,6 +7,8 @@ public enum ErrorType {
 	PARAMETER_ERROR,
 	
 	INVALID_PARAM_SERVICE_ID,	//无效serviceId
+	INVALID_APP_KEY,		//无效的AppKey参数
+	INVALID_SIGNATURE,	//无效签名
 	INSUFFICIENT_USER_PERMISSIONS,	//用户权限不足
 	INVALID_PARAM_REQUEST_BODY_FORMAT,	//参数指定无效请求体数据格式
 	INVALID_REQUEST_MAIN_DATA_FORMAT,		//完整请求报文数据格式不正确
