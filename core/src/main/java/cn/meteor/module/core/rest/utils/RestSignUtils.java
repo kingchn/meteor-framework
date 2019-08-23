@@ -21,7 +21,7 @@ public class RestSignUtils {
 	public static String getSign(RestCommonRequest request, String requestBodyString, String appSecret) {
 		
 		String joinString = "";
-		joinString = request.getServiceId() + request.getTranSeq() + request.getTimestamp();
+		joinString = request.getAppKey() + request.getServiceId() + request.getTranSeq() + request.getTimestamp();
 		if (StringUtils.isNotBlank(requestBodyString)) {
 			joinString += requestBodyString;
 		}

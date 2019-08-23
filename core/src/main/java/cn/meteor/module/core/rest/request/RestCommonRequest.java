@@ -36,9 +36,11 @@ public class RestCommonRequest implements Serializable {
 //	@NotNull(message = "body不能为空" )
 	private Object body;
 	
+	private String appKey;
+	
 	private String sign;
 	
-	private String appKey;
+	private String signMethod;
 
 	public String getServiceId() {
 		return serviceId;
@@ -80,6 +82,14 @@ public class RestCommonRequest implements Serializable {
 		this.body = body;
 	}
 
+	public String getAppKey() {
+		return appKey;
+	}
+
+	public void setAppKey(String appKey) {
+		this.appKey = appKey;
+	}
+
 	public String getSign() {
 		return sign;
 	}
@@ -88,12 +98,12 @@ public class RestCommonRequest implements Serializable {
 		this.sign = sign;
 	}
 
-	public String getAppKey() {
-		return appKey;
+	public String getSignMethod() {
+		return signMethod;
 	}
 
-	public void setAppKey(String appKey) {
-		this.appKey = appKey;
+	public void setSignMethod(String signMethod) {
+		this.signMethod = signMethod;
 	}
 
 	

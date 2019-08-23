@@ -2,7 +2,6 @@ package cn.meteor.module.core.rest.response;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

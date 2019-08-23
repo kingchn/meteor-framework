@@ -212,9 +212,8 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_SERVICE_ID);
 		}
 		
-		RequiresPermissions requiresPermissions = requiresPermissionsAnnotationMap.get(methodKey);
-		
-		
+		//用户权限控制
+		RequiresPermissions requiresPermissions = requiresPermissionsAnnotationMap.get(methodKey);		
 		AuthorizingUtils.assertAuthorized(requiresPermissions);
 		
 		
