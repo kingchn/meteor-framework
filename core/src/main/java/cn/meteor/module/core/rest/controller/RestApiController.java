@@ -3,9 +3,10 @@ package cn.meteor.module.core.rest.controller;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +50,7 @@ import cn.meteor.module.core.rest.request.RestBodyRequest;
 import cn.meteor.module.core.rest.request.RestCommonRequest;
 import cn.meteor.module.core.rest.response.RestCommonResponse;
 import cn.meteor.module.core.rest.utils.RestSignUtils;
+import cn.meteor.module.util.time.DateUtils;
 
 @RequestMapping("${core.rest.rootPath}")
 @RestController
@@ -151,7 +153,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	 * 验证请求签名
 	 * @param restCommonRequest
 	 */
-	protected <T> void validRequestSign(RestCommonRequest restCommonRequest, String requestBodyString) {
+	protected void validRequestSign(RestCommonRequest restCommonRequest, String requestBodyString) {
 		String appKey =  restCommonRequest.getAppKey();
 		String appSecret = null;
 		if(appSecretManager.isContainAppKey(appKey)) {
@@ -165,6 +167,34 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		logger.debug("serverSign:" + serverSignString);
 		if(!requestSignString.equals(serverSignString)) {//无效签名
 			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_SIGNATURE);
+		}
+	}
+	
+	/**
+	 * 验证请求时间戳
+	 * @param restCommonRequest
+	 */
+	protected void validRequestTimestamp(RestCommonRequest restCommonRequest) {
+		boolean isTimeStampValid = false;
+		Date formTimeStampDate = null;
+		try {
+			Long timestampLong = Long.valueOf(restCommonRequest.getTimestamp());
+			formTimeStampDate = new Date(timestampLong);
+		} catch (Exception e) {
+			isTimeStampValid = false;
+		}
+		if (formTimeStampDate == null) {
+			isTimeStampValid = false;
+		} else {
+			long s = DateUtils.getTimeMinus(new Date(), formTimeStampDate);
+			if (s > 600000 || s < -600000) {// 前后10分钟以外的为无效
+				isTimeStampValid = false;
+			} else {
+				isTimeStampValid = true;
+			}
+		}
+		if(isTimeStampValid == false) {//非法的时间戳参数
+			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_TIMESTAMP);
 		}
 	}
 	
@@ -221,6 +251,9 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		
 		//获取请求报文中body的原始字符串。base64则为base64字符串；json则为json字符串
 		String requestBodyString = getRequestBodyString(restCommonRequest);
+		
+		//验证时间戳
+		validRequestTimestamp(restCommonRequest);
 		
 		//验证请求签名
 		validRequestSign(restCommonRequest, requestBodyString);

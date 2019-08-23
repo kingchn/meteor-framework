@@ -8,6 +8,7 @@ public enum ErrorType {
 	
 	INVALID_PARAM_SERVICE_ID,	//无效serviceId
 	INVALID_APP_KEY,		//无效的AppKey参数
+	INVALID_TIMESTAMP,	//非法的时间戳参数
 	INVALID_SIGNATURE,	//无效签名
 	INSUFFICIENT_USER_PERMISSIONS,	//用户权限不足
 	INVALID_PARAM_REQUEST_BODY_FORMAT,	//参数指定无效请求体数据格式
