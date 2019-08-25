@@ -25,6 +25,14 @@ public class BodyReaderHttpServletRequestWrapper extends HttpServletRequestWrapp
 		// body = StreamUtil.readBytes(request.getReader(),JoddDefault.encoding);
 		// 因为http协议默认传输的编码就是iso-8859-1,如果使用utf-8转码乱码的话，可以尝试使用iso-8859-1
 		body = StreamUtil.readBytes(request.getReader(), "iso-8859-1");
+//		body = StreamUtil.readBytes(request.getReader(), "utf-8");
+	}
+	
+	public BodyReaderHttpServletRequestWrapper(HttpServletRequest request, String encoding) throws IOException {
+		super(request);
+		// body = StreamUtil.readBytes(request.getReader(),JoddDefault.encoding);
+		// 因为http协议默认传输的编码就是iso-8859-1,如果使用utf-8转码乱码的话，可以尝试使用iso-8859-1
+		body = StreamUtil.readBytes(request.getReader(), encoding);
 	}
 
 	@Override

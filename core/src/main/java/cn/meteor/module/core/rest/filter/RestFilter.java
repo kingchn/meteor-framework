@@ -83,7 +83,7 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
     	String requestBody = null;
         String responseBody = null;
 //        ContentCachingRequestWrapper requestWrapper = new ContentCachingRequestWrapper(request);
-        ServletRequest requestWrapper = new BodyReaderHttpServletRequestWrapper((HttpServletRequest) request);//保证request.getInputStream()可以重复调用
+        ServletRequest requestWrapper = new BodyReaderHttpServletRequestWrapper((HttpServletRequest) request, "utf-8");//保证request.getInputStream()可以重复调用
         ContentCachingResponseWrapper responseWrapper = null;
         
         String servletPath = request.getServletPath();
