@@ -1,4 +1,4 @@
-package cn.meteor.module.core.rest.controller;
+package cn.meteor.module.core.rest.utils;
 
 import java.lang.annotation.Annotation;
 

@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Method;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,19 +23,24 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import cn.meteor.module.core.openApi.servlet.BodyReaderHttpServletRequestWrapper;
 import cn.meteor.module.core.rest.container.RestContainer;
+import cn.meteor.module.core.rest.exception.ErrorMsgUtils;
+import cn.meteor.module.core.rest.exception.ErrorType;
+import cn.meteor.module.core.rest.exception.RestExceptionHandler;
 import cn.meteor.module.core.rest.request.RestCommonRequest;
 import cn.meteor.module.core.rest.response.RestCommonResponse;
-import cn.meteor.module.core.rest.utils.RestRequestValidUtils;
+import cn.meteor.module.core.rest.utils.RestRequestUtils;
+import cn.meteor.module.core.rest.vo.RestApiVo;
 import cn.meteor.module.util.spring.SpringWebUtils;
 
 //@Component
 public class RestFilter extends OncePerRequestFilter implements Ordered {
 
-//    private final Log logger = LogFactory.getLog(getClass());
-//	private static final Logger logger = LogManager.getLogger(RestApiController.class);
-	private final Logger logger = LogManager.getLogger(getClass());
+	private static final Logger logger = LogManager.getLogger(RestFilter.class);
+//	private final Logger logger = LogManager.getLogger(getClass());
 
     // put filter at the end of all other filters to make sure we are processing after all others
     private int order = Ordered.LOWEST_PRECEDENCE - 8;
@@ -89,15 +95,12 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
 
 				requestBody = IOUtils.toString(requestWrapper.getInputStream(), UTF_8);
 				RestCommonRequest restCommonRequest = restContainer.getObjectMapper().readValue(requestBody, RestCommonRequest.class);
+				requestWrapper.setAttribute("restCommonRequest", restCommonRequest);
 				
-				//验证时间戳
-				RestRequestValidUtils.validRequestTimestamp(restCommonRequest);
+				//校验
+				valid(restCommonRequest, requestWrapper);
 				
-				//获取请求报文中body的原始字符串。base64则为base64字符串；json则为json字符串
-				String requestBodyJsonString = RestRequestValidUtils.getRequestJsonBodyString(restCommonRequest, restContainer.getObjectMapper());
 				
-				//验证请求签名
-				RestRequestValidUtils.validRequestSign(restCommonRequest, requestBodyJsonString, restContainer.getAppSecretManager());
 				
 				// pass through filter chain to do the actual request handling
 				filterChain.doFilter(requestWrapper, responseWrapper);
@@ -130,6 +133,47 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
         
     }
 	
+	public void valid(RestCommonRequest restCommonRequest, ServletRequest requestWrapper) throws JsonProcessingException {
+		//验证时间戳
+		RestRequestUtils.validRequestTimestamp(restCommonRequest);
+		
+		//获取请求报文中body的原始字符串。base64则为base64字符串；json则为json字符串
+		String requestBodyJsonString = RestRequestUtils.getRequestJsonBodyString(restCommonRequest, restContainer.getObjectMapper());
+		
+		//验证请求签名
+		RestRequestUtils.validRequestSign(restCommonRequest, requestBodyJsonString, restContainer.getAppSecretManager());
+		
+		RestApiVo restApiVo = new RestApiVo();				
+		String methodString=restCommonRequest.getServiceId();
+		String[] strs = methodString.split("[.]");//第一点之前是类 ；后面的都是方法名
+		String className = strs[0];
+		String methodName = methodString.substring(methodString.indexOf(".")+1);
+		
+		String classKey = className;
+		String methodKey= className + "." + methodName;
+		
+		restApiVo.setClassKey(classKey);
+		restApiVo.setMethodKey(methodKey);
+		
+		Class<?> clazz = restContainer.getClazzMap().get(classKey);
+		
+		if(clazz==null) {//找不到这个类，说明serviceId不正确
+			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_SERVICE_ID);
+		}
+		
+		Object service = restContainer.getBeanFactory().getBean(clazz);
+		Method method = restContainer.getMethodMap().get(methodKey);
+		
+		restApiVo.setService(service);
+		restApiVo.setMethod(method);
+		
+		if(method==null) {//找不到这个方法，说明serviceId不正确
+			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_SERVICE_ID);
+		}
+		
+		requestWrapper.setAttribute("restApiVo", restApiVo);
+	}
+	
 	/**
 	 * 打印日志
 	 */
@@ -149,7 +193,7 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
 		if (traceString != null) {
 			logString += "错误信息: " + traceString;
 		}
-		logger.info(logString);
+		logger.error(logString);
 	}
 
 

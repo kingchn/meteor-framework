@@ -1,4 +1,4 @@
-package cn.meteor.module.core.rest.filter;
+package cn.meteor.module.core.rest.exception;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

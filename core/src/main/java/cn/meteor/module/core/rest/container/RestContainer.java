@@ -9,6 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +28,13 @@ import cn.meteor.module.core.rest.annotation.RestClass;
 import cn.meteor.module.core.rest.annotation.RestMethod;
 
 @Component
-public class RestContainer implements InitializingBean {
+public class RestContainer implements InitializingBean, BeanFactoryAware {
 	
 	private static final Logger logger = LogManager.getLogger(RestContainer.class);
 	
 	@Value("${core.rest.basePackages}")
-	private String basePackages;	
+	private String basePackages;
+	
 	@Autowired
 	private AppSecretManager appSecretManager;
 	
@@ -56,6 +60,17 @@ public class RestContainer implements InitializingBean {
 	 */
 	private Map<String, RequiresPermissions> requiresPermissionsAnnotationMap = new HashMap<>();
 
+	
+	private BeanFactory beanFactory;
+
+	public BeanFactory getBeanFactory() {
+		return beanFactory;
+	}
+
+	@Override
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;		
+	}
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
