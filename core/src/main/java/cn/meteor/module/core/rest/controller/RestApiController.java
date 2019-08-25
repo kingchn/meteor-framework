@@ -3,13 +3,8 @@ package cn.meteor.module.core.rest.controller;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.validation.Valid;
 import javax.validation.Validation;
@@ -22,10 +17,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.AnnotatedTypeScanner;
 import org.springframework.validation.BindException;
 import org.springframework.validation.Validator;
 import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
@@ -35,15 +27,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
-import cn.meteor.module.core.openApi.secret.AppSecretManager;
-import cn.meteor.module.core.rest.annotation.RestClass;
 import cn.meteor.module.core.rest.annotation.RestMethod;
+import cn.meteor.module.core.rest.container.RestContainer;
 import cn.meteor.module.core.rest.exception.ErrorMsgUtils;
 import cn.meteor.module.core.rest.exception.ErrorType;
 import cn.meteor.module.core.rest.request.RestBodyRequest;
@@ -54,86 +43,20 @@ import cn.meteor.module.util.time.DateUtils;
 
 @RequestMapping("${core.rest.rootPath}")
 @RestController
-public class RestApiController implements BeanFactoryAware, InitializingBean {
+public class RestApiController implements BeanFactoryAware {
 	
 	private static final Logger logger = LogManager.getLogger(RestApiController.class);
 
-	private BeanFactory beanFactory;
-	
-	
-	@Value("${core.rest.basePackages}")
-	private String basePackages;
-	
 	@Autowired
-	private AppSecretManager appSecretManager;
+	private RestContainer restContainer;
 
-	/**
-	 * 类map，key RestClass注解的值；value 扫描得到的Class
-	 */
-	private Map<String, Class<?>> clazzMap = new HashMap<>();
-	
-	/**
-	 * 方法map，key RestClass注解的值 + "." + RestMethod注解的值；value 扫描得到的Method
-	 */
-	private Map<String, Method> methodMap = new HashMap<>();
-	
-	/**
-	 * 方法map，key RestClass注解的值 + "." + RestMethod注解的值；value RestMethod注解
-	 */
-	private Map<String, RestMethod> restMethodAnnotationMap = new HashMap<>();
-	
-	/**
-	 * 方法map，key RestClass注解的值 + "." + RestMethod注解的值；value RequiresPermissions注解
-	 */
-	private Map<String, RequiresPermissions> requiresPermissionsAnnotationMap = new HashMap<>();
-	
-	private ObjectMapper objectMapper = new ObjectMapper();
-	
+	private BeanFactory beanFactory;
+
 	@Override
-	public void afterPropertiesSet() throws Exception {
-		
-		if(StringUtils.isEmpty(basePackages)){
-			logger.error("core.rest.basePackages不能为空，服务终止！");
-			System.exit(-1);
-		}
-		
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);	//忽略未知字段   
-		objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);			//兼容字段名没双引号包围
-		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);//只显示非空字段
-		
-		AnnotatedTypeScanner s = new AnnotatedTypeScanner(RestClass.class);
-		Set<Class<?>> clzSet = s.findTypes(basePackages);
-		for(Class<?> clz : clzSet) {
-			RestClass restClass = clz.getAnnotation(RestClass.class);
-			if(restClass != null){
-				String restClassValue = restClass.value();
-				clazzMap.put(restClassValue, clz);
-
-				Method[] methods = clz.getMethods();
-				for (Method m : methods) {
-					RestMethod restMethod = m.getAnnotation(RestMethod.class);
-					if(restMethod != null) {
-						String restMethodValue = null;
-						if(StringUtils.isBlank(restMethod.value())) {//如果RestMethod注解值为空，则使用方法名
-							restMethodValue = restClassValue + "." + m.getName();
-						} else {//否则使用RestMethod注解值
-							restMethodValue = restClassValue + "." + restMethod.value();
-						}
-						methodMap.put(restMethodValue, m);
-						restMethodAnnotationMap.put(restMethodValue, restMethod);
-						
-						//初始化requiresPermissionsAnnotationMap数据
-						RequiresPermissions requiresPermissions = m.getAnnotation(RequiresPermissions.class);
-						if(requiresPermissions != null) {
-							requiresPermissionsAnnotationMap.put(restMethodValue, requiresPermissions);
-						}
-					}
-				}
-			}			
-			
-		}
-		
+	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
+		this.beanFactory = beanFactory;		
 	}
+	
 	
 	/**
 	 * 验证请求对象
@@ -156,8 +79,8 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 	protected void validRequestSign(RestCommonRequest restCommonRequest, String requestBodyString) {
 		String appKey =  restCommonRequest.getAppKey();
 		String appSecret = null;
-		if(appSecretManager.isContainAppKey(appKey)) {
-			appSecret = appSecretManager.getSecret(appKey);
+		if(restContainer.getAppSecretManager().isContainAppKey(appKey)) {
+			appSecret = restContainer.getAppSecretManager().getSecret(appKey);
 		} else {//appKey 无效
 			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_APP_KEY);
 		}
@@ -198,6 +121,20 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		}
 	}
 	
+	/**
+	 * 验证请求对象
+	 * @param object
+	 * @throws BindException
+	 */
+	protected <T> void validBusinessRequest(T object) throws BindException {
+		Validator validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
+		BindException bindException = new BindException(object, object.getClass().getSimpleName());
+		validator.validate(object,bindException);
+		if (bindException.hasErrors()) {
+			throw bindException;
+		}		
+	}
+	
 	private String getRequestBodyString(RestCommonRequest restCommonRequest) throws Exception {
 		String requestBodyString = null;
 		String requestBodyFormat = restCommonRequest.getRequestBodyFormat();
@@ -209,8 +146,8 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		if(restCommonRequest.getBody()!=null) {
 			if("base64".equals(restCommonRequest.getRequestBodyFormat())) {
 				requestBodyString = "" + restCommonRequest.getBody();
-			} else {//默认json对象（明文）
-				requestBodyString = objectMapper.writeValueAsString(restCommonRequest.getBody());
+			} else {//默认json对象（明文）				
+				requestBodyString = restContainer.getObjectMapper().writeValueAsString(restCommonRequest.getBody());
 			}
 		}
 		return requestBodyString;
@@ -229,34 +166,37 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		String classKey = className;
 		String methodKey= className + "." + methodName;
 		
-		Class<?> clazz = clazzMap.get(classKey);
+		Class<?> clazz = restContainer.getClazzMap().get(classKey);
 		
 		if(clazz==null) {//找不到这个类，说明serviceId不正确
 			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_SERVICE_ID);
 		}
 		
 		Object service = beanFactory.getBean(clazz);
-		Method m = methodMap.get(methodKey);
+		Method m = restContainer.getMethodMap().get(methodKey);
 		
 		if(m==null) {//找不到这个方法，说明serviceId不正确
 			ErrorMsgUtils.throwIsvException(ErrorType.INVALID_PARAM_SERVICE_ID);
-		}
+		}	
 		
-		//用户权限控制
-		RequiresPermissions requiresPermissions = requiresPermissionsAnnotationMap.get(methodKey);		
-		AuthorizingUtils.assertAuthorized(requiresPermissions);
-		
-		
-		RestMethod restMethod = restMethodAnnotationMap.get(methodKey);
-		
-		//获取请求报文中body的原始字符串。base64则为base64字符串；json则为json字符串
-		String requestBodyString = getRequestBodyString(restCommonRequest);
 		
 		//验证时间戳
 		validRequestTimestamp(restCommonRequest);
 		
+		//获取请求报文中body的原始字符串。base64则为base64字符串；json则为json字符串
+		String requestBodyString = getRequestBodyString(restCommonRequest);
+		
 		//验证请求签名
 		validRequestSign(restCommonRequest, requestBodyString);
+		
+		//用户权限控制
+		RequiresPermissions requiresPermissions = restContainer.getRequiresPermissionsAnnotationMap().get(methodKey);		
+		AuthorizingUtils.assertAuthorized(requiresPermissions);
+		
+		
+		RestMethod restMethod = restContainer.getRestMethodAnnotationMap().get(methodKey);
+		
+		
 		
 		Class<?>[] cls = m.getParameterTypes();
 		Object result = null;
@@ -294,7 +234,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 								if(rawType.getTypeName().equals(RestBodyRequest.class.getCanonicalName())) {//参数类型是RestBodyRequest<T>
 									isRestBodyRequest = true;
 									JavaType actualJavaType = TypeFactory.defaultInstance().constructType(actualType);//RestBodyRequest<T>的T的JavaType
-									Object data = objectMapper.readValue(bodyJson, actualJavaType);
+									Object data = restContainer.getObjectMapper().readValue(bodyJson, actualJavaType);
 									RestBodyRequest restBodyRequest = new RestBodyRequest();
 									restBodyRequest.setData(data);
 									param = restBodyRequest;
@@ -303,7 +243,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 							
 							if (isRestBodyRequest == false) {// 如果参数类型不是RestBodyRequest<T>，则按一般处理，json反序列化对应整个RestBodyRequest<T>
 								JavaType javaType = TypeFactory.defaultInstance().constructType(type);
-								param = objectMapper.readValue(bodyJson, javaType);
+								param = restContainer.getObjectMapper().readValue(bodyJson, javaType);
 							}
 						}
 					}
@@ -332,7 +272,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 						if(rawType.getTypeName().equals(RestBodyRequest.class.getCanonicalName())) {//参数类型是RestBodyRequest<T>
 							isRestBodyRequest = true;
 							JavaType actualJavaType = TypeFactory.defaultInstance().constructType(actualType);//RestBodyRequest<T>的T的JavaType
-							Object data = objectMapper.readValue(bodyJsonString, actualJavaType);
+							Object data = restContainer.getObjectMapper().readValue(bodyJsonString, actualJavaType);
 							RestBodyRequest restBodyRequest = new RestBodyRequest();
 							restBodyRequest.setData(data);
 							param = restBodyRequest;
@@ -341,7 +281,7 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 					
 					if(isRestBodyRequest == false) {//如果参数类型不是RestBodyRequest<T>，则按一般处理，json反序列化对应整个RestBodyRequest<T>
 						JavaType javaType = TypeFactory.defaultInstance().constructType(type);					
-						param = objectMapper.readValue(bodyJsonString, javaType);
+						param = restContainer.getObjectMapper().readValue(bodyJsonString, javaType);
 					}
 				}
 			}
@@ -386,25 +326,5 @@ public class RestApiController implements BeanFactoryAware, InitializingBean {
 		restCommonResponse.setTimestamp((new Date()).getTime());
 				
 		return restCommonResponse;
-	}
-	
-	/**
-	 * 验证请求对象
-	 * @param object
-	 * @throws BindException
-	 */
-	protected <T> void validBusinessRequest(T object) throws BindException {
-		Validator validator = new SpringValidatorAdapter(Validation.buildDefaultValidatorFactory().getValidator());
-		BindException bindException = new BindException(object, object.getClass().getSimpleName());
-		validator.validate(object,bindException);
-		if (bindException.hasErrors()) {
-			throw bindException;
-		}		
-	}
-
-	@Override
-	public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
-		this.beanFactory = beanFactory;
-		
 	}
 }
