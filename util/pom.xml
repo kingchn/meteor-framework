@@ -50,7 +50,8 @@
 		<orika.version>1.5.1</orika.version>
 		<!-- <dozer.version>5.5.1</dozer.version> -->
 		<dozer.github.version>6.5.0</dozer.github.version>
-		<zxing.version>3.3.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 -->
+		<zxing.version>3.3.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 -->		
+		<servlet-api.version>3.0.1</servlet-api.version><!-- 3.0.1 3.1.0 -->
 		<junit.version>4.12</junit.version>
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.4</commons-io.version>
@@ -93,7 +94,21 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
 		</dependency>
-		<!-- spring end -->		
+		
+		<dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+		<!-- spring end -->
+		
+		<!-- servlet-api start -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>${servlet-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<!-- servlet-api end -->
 		
 		<dependency>
 			<groupId>org.apache.commons</groupId>
