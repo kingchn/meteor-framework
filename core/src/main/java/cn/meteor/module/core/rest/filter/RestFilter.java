@@ -5,6 +5,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,6 +36,7 @@ import cn.meteor.module.core.rest.response.RestCommonResponse;
 import cn.meteor.module.core.rest.utils.RestRequestUtils;
 import cn.meteor.module.core.rest.vo.RestApiVo;
 import cn.meteor.module.util.spring.SpringWebUtils;
+import cn.meteor.module.util.time.DateUtils;
 
 //@Component
 public class RestFilter extends OncePerRequestFilter implements Ordered {
@@ -75,6 +77,8 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
 	@Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
         throws ServletException, IOException {
+		
+		Date startDate = new Date();
     	
     	String requestBody = null;
         String responseBody = null;
@@ -90,41 +94,47 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
 		}    	
         
         if(isRestRequest) {
+        	RestCommonRequest restCommonRequest = null;
             try {
 				responseWrapper =  new ContentCachingResponseWrapper(response);
 
 				requestBody = IOUtils.toString(requestWrapper.getInputStream(), UTF_8);
-				RestCommonRequest restCommonRequest = restContainer.getObjectMapper().readValue(requestBody, RestCommonRequest.class);
+				restCommonRequest = restContainer.getObjectMapper().readValue(requestBody, RestCommonRequest.class);
 				requestWrapper.setAttribute("restCommonRequest", restCommonRequest);
 				
 				//校验
-				valid(restCommonRequest, requestWrapper);
-				
-				
+				valid(restCommonRequest, requestWrapper);				
 				
 				// pass through filter chain to do the actual request handling
 				filterChain.doFilter(requestWrapper, responseWrapper);
 				
 				responseBody = SpringWebUtils.getResponseBody(responseWrapper);
 				
+				long costTime = DateUtils.getTimeMinus(new Date(), startDate);
+	            responseWrapper.setHeader("cost-time", "" + costTime);
+				printCostTimeLog(restCommonRequest, costTime);//打印耗时日志
+				
 				if (!responseBody.startsWith("{\"code\":\"1\"")  || responseWrapper.getStatus()==HttpStatus.INTERNAL_SERVER_ERROR.value()) {//rest接口返回非成功状态
-					printLog(request, requestBody, responseBody);
+					printLog(request, requestBody, responseBody, costTime);
 				}
 				responseWrapper.copyBodyToResponse();//确保response输出
 			} catch (Exception ex) {//filter 发生的异常，则不会走doFilter，这里直接处理异常并输出响应报文、打印日志
-				RestCommonResponse responseObject = restExceptionHandler.handleException(request, response, ex);
-				
+				RestCommonResponse responseObject = restExceptionHandler.handleException(request, response, ex);				  
+		        responseBody = restContainer.getObjectMapper().writeValueAsString(responseObject);
+		        
+		        long costTime = DateUtils.getTimeMinus(new Date(), startDate);
+	            response.setHeader("cost-time", "" + costTime);
+				printCostTimeLog(restCommonRequest, costTime);//打印耗时日志
+	            
 				response.setContentType("application/json;charset=UTF-8");
 		        response.setCharacterEncoding("UTF-8");
-		        PrintWriter out = response.getWriter();        
-		        responseBody = restContainer.getObjectMapper().writeValueAsString(responseObject);
+		        PrintWriter out = response.getWriter();      
 		        out.println(responseBody);
 		        out.flush();
 		        out.close();
 		        
-		        printLog(request, requestBody, responseBody);
-			}
-            
+		        printLog(request, requestBody, responseBody, costTime);
+			}            
 			
         } else {
         	// pass through filter chain to do the actual request handling
@@ -133,7 +143,7 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
         
     }
 	
-	public void valid(RestCommonRequest restCommonRequest, ServletRequest requestWrapper) throws JsonProcessingException {
+	private void valid(RestCommonRequest restCommonRequest, ServletRequest requestWrapper) throws JsonProcessingException {
 		//验证时间戳
 		RestRequestUtils.validRequestTimestamp(restCommonRequest);
 		
@@ -177,7 +187,7 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
 	/**
 	 * 打印日志
 	 */
-	public void printLog(HttpServletRequest request, String requestBody, String responseBody) throws IOException {
+	private void printLog(HttpServletRequest request, String requestBody, String responseBody, Long costTime) throws IOException {
 		String traceString = null;
 		Object traceObject = request.getAttribute("traceString");
 		if (traceObject != null) {
@@ -190,10 +200,21 @@ public class RestFilter extends OncePerRequestFilter implements Ordered {
 		if (responseBody != null) {
 			logString += "响应报文: " + responseBody + "\n";
 		}
+		if (costTime != null) {
+			logString += "耗时: " + costTime + "\n";
+		}
 		if (traceString != null) {
 			logString += "错误信息: " + traceString;
 		}
 		logger.error(logString);
+	}
+	
+	private void printCostTimeLog(RestCommonRequest restCommonRequest, Long costTime) {
+		if (restCommonRequest != null) {
+			logger.info("===>tranSeq:" + restCommonRequest.getTranSeq() + " serviceId:" + restCommonRequest.getServiceId() + " costTime:" + costTime);
+		} else {
+			logger.info("===>serviceId:" + "[unknown]" + " costTime:" + costTime);
+		}
 	}
 
 
