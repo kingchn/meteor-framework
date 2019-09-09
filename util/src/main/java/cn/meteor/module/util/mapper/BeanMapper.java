@@ -52,7 +52,7 @@ public class BeanMapper {
 
 	static {			    
 		MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
-		mapper = mapperFactory.getMapperFacade();		
+		mapper = mapperFactory.getMapperFacade();
 		
 //		旧版本(net.sf.dozer) 通过配置文件初始化
 //		dozerBeanMapper = new DozerBeanMapper();
@@ -104,6 +104,22 @@ public class BeanMapper {
 		classMapBuilder.byDefault().register();
 		return mapper;
 	}
+	
+	public <S, D> MapperFacade getCustomMapperFacade(Type<S> sourceType, Type<D> destinationType, Map<String, String> customMap) {
+		MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
+		MapperFacade  mapper = mapperFactory.getMapperFacade();
+		ClassMapBuilder<S, D> classMapBuilder = mapperFactory.classMap(sourceType, destinationType);
+		for (String key : customMap.keySet()) {
+			String target = customMap.get(key);
+			if(StringUtils.isNotBlank(target)) {
+				classMapBuilder.field(key, target);
+			} else {
+				classMapBuilder.exclude(key);
+			}
+		}
+		classMapBuilder.byDefault().register();
+		return mapper;
+	}
 
 	/**
 	 * 简单的复制出新类型对象.
@@ -131,6 +147,17 @@ public class BeanMapper {
 	 * 预先通过BeanMapper.getType() 静态获取并缓存Type类型，在此处传入
 	 */
 	public static <S, D> D map(S source, Type<S> sourceType, Type<D> destinationType) {
+		return mapper.map(source, sourceType, destinationType);
+	}
+	
+	/**
+	 * 极致性能的复制出新类型对象.(支持自定义map)
+	 * 
+	 * 预先通过BeanMapper.getType() 静态获取并缓存Type类型，在此处传入
+	 */
+	public static <S, D> D customMap(S source, Type<S> sourceType, Type<D> destinationType, Map<String, String> customMap) {
+		BeanMapper beanMapper = new BeanMapper();   
+		MapperFacade mapper = beanMapper.getCustomMapperFacade(sourceType, destinationType, customMap);
 		return mapper.map(source, sourceType, destinationType);
 	}
 
