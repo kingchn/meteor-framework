@@ -52,6 +52,7 @@
 		<dozer.github.version>6.5.0</dozer.github.version>
 		<zxing.version>3.3.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 -->		
 		<servlet-api.version>3.0.1</servlet-api.version><!-- 3.0.1 3.1.0 -->
+		<httpclient.version>4.5.3</httpclient.version>
 		<junit.version>4.12</junit.version>
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.4</commons-io.version>
@@ -172,7 +173,7 @@
 		    <artifactId>javase</artifactId>
 		    <version>${zxing.version}</version>
 		</dependency>
-		<!-- qrcode start -->
+		<!-- qrcode end -->
 		
 
 		<dependency>
@@ -185,6 +186,19 @@
 			<artifactId>bcpkix-jdk15on</artifactId>
 			<version>1.62</version>
 		</dependency>
+		
+		<!-- httpclient start -->
+		<dependency>
+		  <groupId>org.apache.httpcomponents</groupId>
+		  <artifactId>httpclient</artifactId>
+		  <version>${httpclient.version}</version>
+		</dependency>
+		<dependency>  
+            <groupId>org.apache.httpcomponents</groupId>  
+            <artifactId>httpmime</artifactId>  
+            <version>${httpclient.version}</version>  
+        </dependency>
+		<!-- httpclient end -->
 
 		
 		<!-- test start -->
