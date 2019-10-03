@@ -39,6 +39,7 @@ public class HexUtils {
 	 * 将16进制数字字符串转成字节数组
 	 */
 	public static byte[] hexToByteArray(String hexString) {
+		hexString = hexString.toUpperCase();//因这里定义的16进制数字字符集hexChars使用大写，所以这里要转大写
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(hexString.length() / 2);
 		// 将每2位16进制整数组装成一个字节
 		for (int i = 0; i < hexString.length(); i += 2)
