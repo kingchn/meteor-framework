@@ -11,6 +11,7 @@ import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cn.meteor.module.util.lang.HexUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;
 import cn.meteor.module.util.security.sm.test.util.FileUtil;
@@ -87,6 +88,41 @@ public class SM2UtilsTest extends GMBaseTest {
             Assert.fail();
         }
 	}
+	
+	@Test
+    public void testSignAndVerify_My() {
+        try {
+    		String privateKey = "MIICSwIBADCB7AYHKoZIzj0CATCB4AIBATAsBgcqhkjOPQEBAiEA/////v////////////////////8AAAAA//////////8wRAQg/////v////////////////////8AAAAA//////////wEICjp+p6dn140TVqeS89lCafzl4n1FauPkt28vUFNlA6TBEEEMsSuLB8ZgRlfmQRGajnJlI/jC7/yZgvhcVpFiTNMdMe8Nzai9PZ3nFm9zuNraSFT0KmHfMYqR0AC3zLlITnwoAIhAP////7///////////////9yA99rIcYFK1O79Ak51UEjAgEBBIIBVTCCAVECAQEEIFf8esicQ0k+rhYETe6qb35z20R8XkW3sNRm8Gwo2PRKoIHjMIHgAgEBMCwGByqGSM49AQECIQD////+/////////////////////wAAAAD//////////zBEBCD////+/////////////////////wAAAAD//////////AQgKOn6np2fXjRNWp5Lz2UJp/OXifUVq4+S3by9QU2UDpMEQQQyxK4sHxmBGV+ZBEZqOcmUj+MLv/JmC+FxWkWJM0x0x7w3NqL09necWb3O42tpIVPQqYd8xipHQALfMuUhOfCgAiEA/////v///////////////3ID32shxgUrU7v0CTnVQSMCAQGhRANCAATUFiNhNm8DahSEtZHCB1YUR2aDk2gDf2JtpJB+4z+dXFb+/oEtXDuG2An2iENJSGOtEBAM/KMSz8vMOHV/s3iX";
+    		String publicKey = "MIIBMzCB7AYHKoZIzj0CATCB4AIBATAsBgcqhkjOPQEBAiEA/////v////////////////////8AAAAA//////////8wRAQg/////v////////////////////8AAAAA//////////wEICjp+p6dn140TVqeS89lCafzl4n1FauPkt28vUFNlA6TBEEEMsSuLB8ZgRlfmQRGajnJlI/jC7/yZgvhcVpFiTNMdMe8Nzai9PZ3nFm9zuNraSFT0KmHfMYqR0AC3zLlITnwoAIhAP////7///////////////9yA99rIcYFK1O79Ak51UEjAgEBA0IABNQWI2E2bwNqFIS1kcIHVhRHZoOTaAN/Ym2kkH7jP51cVv7+gS1cO4bYCfaIQ0lIY60QEAz8oxLPy8w4dX+zeJc=";
+    		String srcData = "92440101MA59ABCDEF5e224d98-1a7e-40a3-8918-0b9fc4f94c5e";
+    		
+    		System.out.println("===================== 开始签名");
+    		//签名
+    		byte[] signedData = SM2Utils.sign(privateKey, srcData.getBytes());
+    		String signedDataHexString = ByteUtils.toHexString(signedData);
+            System.out.println("SM2 sign result:" + signedDataHexString);
+//            String signedDataHexString2 = HexUtils.byteArrayToHex(signedData);
+//            System.out.println("SM2 sign result:" + signedDataHexString2.toLowerCase());
+//    		String fpSignedData = ByteUtils.toHexString(signedData);
+    		
+            System.out.println("===================== 开始验签（对上述签名验签）");
+    		//验签（对上述签名验签）
+    		boolean flag = SM2Utils.verify(publicKey, srcData.getBytes(), HexUtils.hexToByteArray(signedDataHexString));		//注意此处要用decodeBase64
+    		System.out.println("SM2 sign verify result（对上述签名验签）: "+ flag);
+            
+    		
+    		System.out.println("===================== 开始验签（对指定值验签）");
+    		//验签（对指定值验签）
+    		String fpSignedData="MEYCIQCAtNcXKhaNzF64TjgyWY3SNUJp/ZJcoRg/3DA+On70QgIhALU4MI/K38hnk2L9RPwSSyvP0kViHCPojLJGOd/K8MMt";    		
+    		System.out.println("fpSignedData:" + fpSignedData);
+    		boolean flag2 = SM2Utils.verify(publicKey, srcData.getBytes(), Base64.decodeBase64(fpSignedData));		//注意此处要用decodeBase64
+    		System.out.println("SM2 sign verify result（对指定值验签）: "+ flag2);
+    		
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Assert.fail();
+        }
+    }
 
     @Test
     public void testSignAndVerify() {

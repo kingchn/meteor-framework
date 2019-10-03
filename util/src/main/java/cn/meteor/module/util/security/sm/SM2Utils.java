@@ -281,7 +281,38 @@ public class SM2Utils extends GMBaseUtils {
 
         return cipherText;
     }
+    
+	/**
+     * 私钥签名
+     * 不指定withId，则默认withId为字节数组:"1234567812345678".getBytes()
+	 * @param priKeyPkcs8DerBase64String  私钥base64字符串
+	 * @param srcData 源数据
+	 * @return 签名
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchProviderException
+	 * @throws CryptoException
+	 * @throws InvalidKeySpecException
+	 */
+	public static byte[] sign(String priKeyPkcs8DerBase64String, byte[] srcData)
+			throws NoSuchAlgorithmException, NoSuchProviderException, CryptoException, InvalidKeySpecException {
+		// 私钥
+		byte[] priKeyPkcs8Der = Base64.decodeBase64(priKeyPkcs8DerBase64String);
+		BCECPrivateKey ecPriKey = BCECUtils.convertPKCS8ToECPrivateKey(priKeyPkcs8Der);
+		
+		ECPrivateKeyParameters priKeyParameters = BCECUtils.convertPrivateKeyToParameters(ecPriKey);
+		return sign(priKeyParameters, null, srcData);
+	}
 
+    /**
+     * 私钥签名
+     * 不指定withId，则默认withId为字节数组:"1234567812345678".getBytes()
+     * @param priKey 私钥
+     * @param srcData 源数据
+     * @return 签名
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws CryptoException
+     */
     public static byte[] sign(BCECPrivateKey priKey, byte[] srcData) throws NoSuchAlgorithmException,
         NoSuchProviderException, CryptoException {
         ECPrivateKeyParameters priKeyParameters = BCECUtils.convertPrivateKeyToParameters(priKey);
@@ -365,7 +396,24 @@ public class SM2Utils extends GMBaseUtils {
         v.add(new ASN1Integer(s));
         return new DERSequence(v).getEncoded(ASN1Encoding.DER);
     }
+    
+    public static boolean verify(String pubKeyX509DerBase64String, byte[] srcData, byte[] sign) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeySpecException {
+    	//公钥
+        byte[] pubKeyX509Der = Base64.decodeBase64(pubKeyX509DerBase64String);
+        BCECPublicKey ecPubKey = BCECUtils.convertX509ToECPublicKey(pubKeyX509Der);
+        
+        ECPublicKeyParameters pubKeyParameters = BCECUtils.convertPublicKeyToParameters(ecPubKey);
+        return verify(pubKeyParameters, null, srcData, sign);
+    }
 
+    /**
+     * 公钥验签
+     * 不指定withId，则默认withId为字节数组:"1234567812345678".getBytes()
+     * @param pubKey 公钥
+     * @param srcData 源数据
+     * @param sign 签名
+     * @return 验签成功返回true，失败返回false
+     */
     public static boolean verify(BCECPublicKey pubKey, byte[] srcData, byte[] sign) {
         ECPublicKeyParameters pubKeyParameters = BCECUtils.convertPublicKeyToParameters(pubKey);
         return verify(pubKeyParameters, null, srcData, sign);
