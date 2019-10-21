@@ -5,11 +5,24 @@ import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 import org.springframework.web.util.WebUtils;
 
 public class SpringWebUtils {
+	
+	public static HttpServletRequest getHttpServletRequest() {
+		HttpServletRequest httpServletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		return httpServletRequest;
+	}
+	
+	public static HttpServletResponse getHttpServletResponse() {
+		HttpServletResponse httpServletResponse = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getResponse();
+		return httpServletResponse;
+	}
+	
 	
 	public static String getRequestBody(ContentCachingRequestWrapper wrappedRequest) {
 		String payload = null;
