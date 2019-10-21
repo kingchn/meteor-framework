@@ -1,5 +1,10 @@
 package cn.meteor.module.util.security.sm.cert.test;
 
+import java.security.KeyPair;
+import java.security.PublicKey;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+
 import org.bouncycastle.asn1.ASN1Encoding;
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.KeyUsage;
@@ -11,6 +16,7 @@ import org.bouncycastle.pkcs.PKCS12PfxPdu;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cn.meteor.module.util.file.FileUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;
 import cn.meteor.module.util.security.sm.cert.CommonUtils;
@@ -18,12 +24,6 @@ import cn.meteor.module.util.security.sm.cert.SM2CertUtils;
 import cn.meteor.module.util.security.sm.cert.SM2PfxMaker;
 import cn.meteor.module.util.security.sm.cert.SM2PublicKey;
 import cn.meteor.module.util.security.sm.cert.SM2X509CertMaker;
-import cn.meteor.module.util.security.sm.test.util.FileUtil;
-
-import java.security.KeyPair;
-import java.security.PublicKey;
-import java.security.Security;
-import java.security.cert.X509Certificate;
 
 public class SM2PfxMakerTest {
     static {
@@ -51,7 +51,7 @@ public class SM2PfxMakerTest {
             PublicKey subPub = BCECUtils.createPublicKeyFromSubjectPublicKeyInfo(request.getSubjectPublicKeyInfo());
             PKCS12PfxPdu pfx = pfxMaker.makePfx(subKP.getPrivate(), subPub, cert, TEST_PFX_PASSWD);
             byte[] pfxDER = pfx.getEncoded(ASN1Encoding.DER);
-            FileUtil.writeFile(TEST_PFX_FILENAME, pfxDER);
+            FileUtils.writeFile(TEST_PFX_FILENAME, pfxDER);
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();
@@ -64,7 +64,7 @@ public class SM2PfxMakerTest {
         testMakePfx();
 
         try {
-            byte[] pkcs12 = FileUtil.readFile(TEST_PFX_FILENAME);
+            byte[] pkcs12 = FileUtils.readFile(TEST_PFX_FILENAME);
             BCECPublicKey publicKey = SM2CertUtils.getPublicKeyFromPfx(pkcs12, TEST_PFX_PASSWD);
             BCECPrivateKey privateKey = SM2CertUtils.getPrivateKeyFromPfx(pkcs12, TEST_PFX_PASSWD);
 

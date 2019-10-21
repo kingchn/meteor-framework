@@ -1,5 +1,10 @@
 package cn.meteor.module.util.security.sm.test;
 
+import java.math.BigInteger;
+import java.security.KeyPair;
+import java.security.Security;
+import java.util.Arrays;
+
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters;
@@ -11,15 +16,10 @@ import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cn.meteor.module.util.file.FileUtils;
 import cn.meteor.module.util.lang.HexUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;
-import cn.meteor.module.util.security.sm.test.util.FileUtil;
-
-import java.math.BigInteger;
-import java.security.KeyPair;
-import java.security.Security;
-import java.util.Arrays;
 
 public class SM2UtilsTest extends GMBaseTest {
 	
@@ -201,10 +201,10 @@ public class SM2UtilsTest extends GMBaseTest {
             byte[] priKeyPkcs8Der = BCECUtils.convertECPrivateKeyToPKCS8(priKey, pubKey);
             System.out.println("private key pkcs8 der length:" + priKeyPkcs8Der.length);
             System.out.println("private key pkcs8 der:" + ByteUtils.toHexString(priKeyPkcs8Der));
-            FileUtil.writeFile("D:/ec.pkcs8.pri.der", priKeyPkcs8Der);
+            FileUtils.writeFile("D:/ec.pkcs8.pri.der", priKeyPkcs8Der);
 
             String priKeyPkcs8Pem = BCECUtils.convertECPrivateKeyPKCS8ToPEM(priKeyPkcs8Der);
-            FileUtil.writeFile("D:/ec.pkcs8.pri.pem", priKeyPkcs8Pem.getBytes("UTF-8"));
+            FileUtils.writeFile("D:/ec.pkcs8.pri.pem", priKeyPkcs8Pem.getBytes("UTF-8"));
             byte[] priKeyFromPem = BCECUtils.convertECPrivateKeyPEMToPKCS8(priKeyPkcs8Pem);
             if (!Arrays.equals(priKeyFromPem, priKeyPkcs8Der)) {
                 throw new Exception("priKeyFromPem != priKeyPkcs8Der");
@@ -215,15 +215,15 @@ public class SM2UtilsTest extends GMBaseTest {
             byte[] priKeyPkcs1Der = BCECUtils.convertECPrivateKeyToSEC1(priKey, pubKey);
             System.out.println("private key pkcs1 der length:" + priKeyPkcs1Der.length);
             System.out.println("private key pkcs1 der:" + ByteUtils.toHexString(priKeyPkcs1Der));
-            FileUtil.writeFile("D:/ec.pkcs1.pri", priKeyPkcs1Der);
+            FileUtils.writeFile("D:/ec.pkcs1.pri", priKeyPkcs1Der);
 
             byte[] pubKeyX509Der = BCECUtils.convertECPublicKeyToX509(pubKey);
             System.out.println("public key der length:" + pubKeyX509Der.length);
             System.out.println("public key der:" + ByteUtils.toHexString(pubKeyX509Der));
-            FileUtil.writeFile("D:/ec.x509.pub.der", pubKeyX509Der);
+            FileUtils.writeFile("D:/ec.x509.pub.der", pubKeyX509Der);
 
             String pubKeyX509Pem = BCECUtils.convertECPublicKeyX509ToPEM(pubKeyX509Der);
-            FileUtil.writeFile("D:/ec.x509.pub.pem", pubKeyX509Pem.getBytes("UTF-8"));
+            FileUtils.writeFile("D:/ec.x509.pub.pem", pubKeyX509Pem.getBytes("UTF-8"));
             byte[] pubKeyFromPem = BCECUtils.convertECPublicKeyPEMToX509(pubKeyX509Pem);
             if (!Arrays.equals(pubKeyFromPem, pubKeyX509Der)) {
                 throw new Exception("pubKeyFromPem != pubKeyX509Der");
@@ -290,7 +290,7 @@ public class SM2UtilsTest extends GMBaseTest {
             byte[] encryptedData = SM2Utils.encrypt(pubKey, SRC_DATA);
 
             byte[] derCipher = SM2Utils.encodeSM2CipherToDER(encryptedData);
-            FileUtil.writeFile("derCipher.dat", derCipher);
+            FileUtils.writeFile("derCipher.dat", derCipher);
 
             byte[] decryptedData = SM2Utils.decrypt(priKey, SM2Utils.decodeDERSM2Cipher(derCipher));
             if (!Arrays.equals(decryptedData, SRC_DATA)) {

@@ -1,5 +1,10 @@
 package cn.meteor.module.util.security.sm.cert.test;
 
+import java.security.KeyPair;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -12,6 +17,7 @@ import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cn.meteor.module.util.file.FileUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;
 import cn.meteor.module.util.security.sm.cert.CertSNAllocator;
@@ -21,12 +27,6 @@ import cn.meteor.module.util.security.sm.cert.SM2CertUtils;
 import cn.meteor.module.util.security.sm.cert.SM2PublicKey;
 import cn.meteor.module.util.security.sm.cert.SM2X509CertMaker;
 import cn.meteor.module.util.security.sm.test.GMBaseTest;
-import cn.meteor.module.util.security.sm.test.util.FileUtil;
-
-import java.security.KeyPair;
-import java.security.Security;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
 
 public class SM2CertUtilTest {
     private static final String ROOT_PRI_PATH = "D:/test.root.ca.pri";
@@ -48,7 +48,7 @@ public class SM2CertUtilTest {
 
             X509Certificate cert = SM2CertUtils.getX509Certificate("test.sm2.cer");
             BCECPublicKey pubKey = SM2CertUtils.getBCECPublicKey(cert);
-            byte[] priKeyData = FileUtil.readFile("test.sm2.pri");
+            byte[] priKeyData = FileUtils.readFile("test.sm2.pri");
             ECPrivateKeyParameters priKeyParameters = BCECUtils.convertSEC1ToECPrivateKey(priKeyData);
 
             byte[] sign = SM2Utils.sign(priKeyParameters, GMBaseTest.WITH_ID, GMBaseTest.SRC_DATA);
@@ -96,7 +96,7 @@ public class SM2CertUtilTest {
                 new KeyUsage(KeyUsage.digitalSignature | KeyUsage.dataEncipherment
                     | KeyUsage.keyCertSign | KeyUsage.cRLSign),
                 rootCSR);
-            FileUtil.writeFile(ROOT_CERT_PATH, rootCACert.getEncoded());
+            FileUtils.writeFile(ROOT_CERT_PATH, rootCACert.getEncoded());
 
             KeyPair midKP = SM2Utils.generateKeyPair();
             X500Name midDN = buildMidCADN();
@@ -110,7 +110,7 @@ public class SM2CertUtilTest {
                 new KeyUsage(KeyUsage.digitalSignature | KeyUsage.dataEncipherment
                     | KeyUsage.keyCertSign | KeyUsage.cRLSign),
                 midCSR);
-            FileUtil.writeFile(MID_CERT_PATH, midCACert.getEncoded());
+            FileUtils.writeFile(MID_CERT_PATH, midCACert.getEncoded());
 
             SM2X509CertMaker midCertMaker = new SM2X509CertMaker(midKP, certExpire, midDN, snAllocator);
             KeyPair userKP = SM2Utils.generateKeyPair();
@@ -124,7 +124,7 @@ public class SM2CertUtilTest {
             X509Certificate userCert = midCertMaker.makeCertificate(false,
                 new KeyUsage(KeyUsage.digitalSignature | KeyUsage.dataEncipherment),
                 userCSR);
-            FileUtil.writeFile(USER_CERT_PATH, userCert.getEncoded());
+            FileUtils.writeFile(USER_CERT_PATH, userCert.getEncoded());
 
             //根证书是自签名，所以用自己的公钥验证自己的证书
             BCECPublicKey bcRootPub = SM2CertUtils.getBCECPublicKey(rootCACert);

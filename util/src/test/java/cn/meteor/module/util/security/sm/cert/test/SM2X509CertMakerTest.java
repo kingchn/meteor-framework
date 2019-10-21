@@ -1,5 +1,13 @@
 package cn.meteor.module.util.security.sm.cert.test;
 
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
+import java.security.Security;
+import java.security.cert.X509Certificate;
+
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x500.X500NameBuilder;
 import org.bouncycastle.asn1.x500.style.BCStyle;
@@ -12,6 +20,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 
+import cn.meteor.module.util.file.FileUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;
 import cn.meteor.module.util.security.sm.cert.CertSNAllocator;
@@ -20,15 +29,6 @@ import cn.meteor.module.util.security.sm.cert.FileSNAllocator;
 import cn.meteor.module.util.security.sm.cert.SM2PublicKey;
 import cn.meteor.module.util.security.sm.cert.SM2X509CertMaker;
 import cn.meteor.module.util.security.sm.cert.exception.InvalidX500NameException;
-import cn.meteor.module.util.security.sm.test.util.FileUtil;
-
-import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.KeyPair;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
-import java.security.cert.X509Certificate;
 
 public class SM2X509CertMakerTest {
 
@@ -50,7 +50,7 @@ public class SM2X509CertMakerTest {
             SM2X509CertMaker certMaker = buildCertMaker();
             X509Certificate cert = certMaker.makeCertificate(false,
                 new KeyUsage(KeyUsage.digitalSignature | KeyUsage.dataEncipherment), csr);
-            FileUtil.writeFile("test.sm2.cer", cert.getEncoded());
+            FileUtils.writeFile("test.sm2.cer", cert.getEncoded());
         } catch (Exception ex) {
             ex.printStackTrace();
             Assert.fail();
@@ -61,7 +61,7 @@ public class SM2X509CertMakerTest {
         ECPrivateKeyParameters priKeyParam = BCECUtils.convertPrivateKeyToParameters(priKey);
         ECPublicKeyParameters pubKeyParam = BCECUtils.convertPublicKeyToParameters(pubKey);
         byte[] derPriKey = BCECUtils.convertECPrivateKeyToSEC1(priKeyParam, pubKeyParam);
-        FileUtil.writeFile(filePath, derPriKey);
+        FileUtils.writeFile(filePath, derPriKey);
     }
 
     public static X500Name buildSubjectDN() {
