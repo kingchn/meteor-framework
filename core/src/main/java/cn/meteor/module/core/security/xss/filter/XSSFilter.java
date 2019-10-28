@@ -12,7 +12,7 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * XSS跨站脚本漏洞处理过滤器
+ * XSS（Cross Site Scripting）：跨域脚本攻击漏洞处理过滤器
  * @author shenjc
  *
  */
