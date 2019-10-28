@@ -16,7 +16,7 @@ public class ChineseMoneyUtils {
 	/**
 	 * 货币单位数组
 	 */
-	private static String[] CN_UNITS = { "分", "角", "元", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万" };
+	private static String[] CN_UNITS = { "分", "角", "圆", "拾", "佰", "仟", "万", "拾", "佰", "仟", "亿", "拾", "佰", "仟", "万" };
 
 	/**
 	 * 将数字转成中文大写金额
@@ -44,11 +44,11 @@ public class ChineseMoneyUtils {
 		}
 
 		String moneyString = sb.toString();
-		moneyString = moneyString.replaceAll("(零[拾|佰|仟|角|分])+", "零").replaceAll("零+元", "元").replaceAll("零+万", "万")
-				.replaceAll("零+亿", "亿").replaceAll("亿万元", "亿元").replaceAll("亿万亿", "亿亿").replaceAll("亿万", "亿零")
+		moneyString = moneyString.replaceAll("(零[拾|佰|仟|角|分])+", "零").replaceAll("零+圆", "圆").replaceAll("零+万", "万")
+				.replaceAll("零+亿", "亿").replaceAll("亿万圆", "亿圆").replaceAll("亿万亿", "亿亿").replaceAll("亿万", "亿零")
 				.replaceAll("零$", "");
 
-		if (moneyString.endsWith("元")) {
+		if (moneyString.endsWith("圆")) {
 			moneyString += "整";
 		}
 
