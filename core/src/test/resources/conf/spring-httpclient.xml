@@ -5,7 +5,7 @@
 	xmlns:c="http://www.springframework.org/schema/c"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="httpClientConnectionManager" class="org.apache.http.impl.conn.PoolingHttpClientConnectionManager.PoolingHttpClientConnectionManager">
+	<bean id="httpClientConnectionManager" class="org.apache.http.impl.conn.PoolingHttpClientConnectionManager">
 		<property name="maxTotal" value="2000" /><!-- 最大总连接数 -->
 		<property name="defaultMaxPerRoute" value="500" /><!-- 每个路由的最大连接数  -->
 	</bean>
