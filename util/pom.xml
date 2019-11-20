@@ -50,6 +50,7 @@
 		<orika.version>1.5.1</orika.version>
 		<dozer.version>5.5.1</dozer.version>
 		<zxing.version>3.3.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 -->
+		<httpclient.version>4.5.3</httpclient.version>
 		<junit.version>4.12</junit.version>
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.4</commons-io.version>
@@ -149,7 +150,20 @@
 		    <artifactId>javase</artifactId>
 		    <version>${zxing.version}</version>
 		</dependency>
-		<!-- qrcode start -->
+		<!-- qrcode end -->			
+		        
+        <!-- httpclient start -->
+        <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+          <version>${httpclient.version}</version>
+        </dependency>
+        <dependency>  
+            <groupId>org.apache.httpcomponents</groupId>  
+            <artifactId>httpmime</artifactId>  
+            <version>${httpclient.version}</version>  
+        </dependency>
+        <!-- httpclient end -->
 
 		
 		<!-- test start -->
