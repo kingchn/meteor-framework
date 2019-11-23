@@ -16,7 +16,7 @@ import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cn.meteor.module.util.file.FileUtils;
+import cn.meteor.module.util.io.FileUtils;
 import cn.meteor.module.util.lang.HexUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;

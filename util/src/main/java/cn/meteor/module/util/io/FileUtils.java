@@ -1,7 +1,10 @@
-package cn.meteor.module.util.file;
+package cn.meteor.module.util.io;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.RandomAccessFile;
+
+import cn.meteor.module.util.lang.BytesAndInputStreamConvertUtils;
 
 /**
  * 文件工具类
@@ -9,6 +12,12 @@ import java.io.RandomAccessFile;
  *
  */
 public class FileUtils {
+	
+	private static FileUtils instance = new FileUtils();
+	
+	private FileUtils() {
+		
+	}
 	
     /**
      * 将字节数组数据写入到指定路径文件
@@ -47,6 +56,18 @@ public class FileUtils {
                 raf.close();
             }
         }
+    }
+    
+    public static byte[] readFileFromRelativePath(String relativeFilePathName) throws IOException {
+//    	InputStream inputStream = ClassLoader.getSystemResourceAsStream(relativeFilePathName);//在tomcat返回是null
+    	InputStream inputStream = instance.getClass().getClassLoader().getResourceAsStream(relativeFilePathName);
+    	return BytesAndInputStreamConvertUtils.inputStreamToBytes(inputStream);
+    }
+    
+    public static String readFileFromRelativePathToString(String relativeFilePathName) throws IOException {
+    	byte[] contentBytes = readFileFromRelativePath(relativeFilePathName);
+    	String contentString = new String(contentBytes);
+    	return contentString;
     }
     
 }

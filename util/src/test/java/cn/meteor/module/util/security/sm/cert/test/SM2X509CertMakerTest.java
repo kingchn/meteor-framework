@@ -20,7 +20,7 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.Assert;
 import org.junit.Test;
 
-import cn.meteor.module.util.file.FileUtils;
+import cn.meteor.module.util.io.FileUtils;
 import cn.meteor.module.util.security.sm.BCECUtils;
 import cn.meteor.module.util.security.sm.SM2Utils;
 import cn.meteor.module.util.security.sm.cert.CertSNAllocator;
