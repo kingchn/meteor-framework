@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import cn.meteor.module.util.file.FileUtils;
+import cn.meteor.module.util.io.FileUtils;
 
 public class ImageUtilsTest {
 
