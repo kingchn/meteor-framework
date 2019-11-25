@@ -4,15 +4,24 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
-public final class SpringUtils implements BeanFactoryPostProcessor {
+public final class SpringUtils implements BeanFactoryPostProcessor, ApplicationContextAware  {
 
     private static ConfigurableListableBeanFactory beanFactory; // Spring应用上下文环境
+    
+    private static ApplicationContext applicationContext;
 
     @Override
     public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
         SpringUtils.beanFactory = beanFactory;
     }
+    
+	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {//ApplicationContextAware接口实现
+		SpringUtils.applicationContext = applicationContext;		
+	}
 
     /**
      * 获取对象
@@ -35,8 +44,7 @@ public final class SpringUtils implements BeanFactoryPostProcessor {
      * @throws org.springframework.beans.BeansException
      *
      */
-    public static <T> T getBean(Class<T> clz) throws BeansException {
-        @SuppressWarnings("unchecked")
+    public static <T> T getBean(Class<T> clz) throws BeansException {        
         T result = (T) beanFactory.getBean(clz);
         return result;
     }
@@ -84,5 +92,20 @@ public final class SpringUtils implements BeanFactoryPostProcessor {
     public static String[] getAliases(String name) throws NoSuchBeanDefinitionException {
         return beanFactory.getAliases(name);
     }
+    
+    /**
+     * 获取当前profiles
+     */
+    public static String[] getActiveProfiles() {
+        return applicationContext.getEnvironment().getActiveProfiles();
+    }
+    
+    /**
+     * 获取当前第一个profile
+     */
+    public static String getActiveProfile() {
+        return applicationContext.getEnvironment().getActiveProfiles()[0];
+    }
+
 
 }
