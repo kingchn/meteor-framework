@@ -150,7 +150,18 @@
 		    <artifactId>javase</artifactId>
 		    <version>${zxing.version}</version>
 		</dependency>
-		<!-- qrcode end -->			
+		<!-- qrcode end -->
+		
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.62</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.62</version>
+		</dependency>
 		        
         <!-- httpclient start -->
         <dependency>
