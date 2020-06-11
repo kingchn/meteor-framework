@@ -175,6 +175,12 @@
             <version>${httpclient.version}</version>  
         </dependency>
         <!-- httpclient end -->
+        
+		<dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>5.5.0</version>
+        </dependency>
 
 		
 		<!-- test start -->
