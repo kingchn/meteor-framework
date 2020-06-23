@@ -43,7 +43,7 @@ public class WebSocketChildChannelHandler extends ChannelInitializer<SocketChann
 		
 		if(this.isSsl==true) {//启用ssl
 //			SSLContext sslContext = createSSLContext("JKS","D://wss.jks","netty123");
-//			SSLContext sslContext = createSSLContext("JKS","F:/workspace/workspace_common/foresee_git_code/bszs-server/bszs-site/src/main/resources/file/websocket_keystore/bszs.keystore","12345678");
+//			SSLContext sslContext = createSSLContext("JKS","F:/websocket_keystore/b.keystore","12345678");
 			SSLContext sslContext = createSSLContext(keyStoreType, keyStorePath, keyStorePassword);        
 			//SSLEngine 此类允许使用ssl安全套接层协议进行安全通信
 	        SSLEngine sslEngine = sslContext.createSSLEngine();

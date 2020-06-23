@@ -19,7 +19,6 @@
       <AppenderRef ref="rollingFile_error"/>
     </Logger> -->
     <Logger name="cn.meteor" level="info" />
-    <Logger name="com.foresee.dzfp" level="debug" />
     <Root level="info">
       <AppenderRef ref="console"/>
     </Root>
