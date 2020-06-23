@@ -26,18 +26,17 @@ public class MimeMailServiceTestCase {
 	
 	@Test
 	public void sendMailWithFromNameTest() {
-//		String from="shenjc.test@gmail.com";
-		String from="dzfpyun@foresee.com.cn";
+		String from="xxx@for.com.cn";
 		String fromName="发送人哦333";
 		String subject="主题MimeMailService";
 //		String text="内容MimeMailService";
-		String text="<div>尊敬的用户：您收到了一张电子发票。请下载附件查看。</div></br>"
-				+ "<div>使用支付宝扫描以下二维码推送发票到支付宝发票管家:</div>"
-				+ "<img src='https://www.dzfpyun.com/siteui/images/index/jdal03.png' type='image/png' />";
-		String to="shenjc@qq.com";
+		String text="<div>尊敬的用户：</div></br>"
+				+ "<div></div>"
+				+ "<img src='https://abc.png' type='image/png' />";
+		String to="aaa@qq.com";
 		try {
 //			mimeJavaMailSender.sendMail(from, fromName, to, subject, text);
-			File file = new File("D:/pdf_test/044001800111_83479496.pdf");
+			File file = new File("D:/pdf_test/aaa.pdf");
 			mimeJavaMailSender.sendMail(from, fromName, to, subject, text, "UTF-8", file, true);
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block
@@ -50,8 +49,8 @@ public class MimeMailServiceTestCase {
 	
 //	@Test
 //	public void sendMailWithTemplateTest() {
-//		String from="shenjc.test@gmail.com";
-//		String to="shenjc@qq.com";
+//		String from="aaa.test@gmail.com";
+//		String to="aaa@qq.com";
 //		String subject="主题MimeMailService-sendMailWithTemplateTest";
 //		String text="内容MimeMailService-sendMailWithTemplateTest";
 //		
