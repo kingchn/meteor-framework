@@ -46,8 +46,12 @@ public class ResponseLoggerFilter implements Filter {
 				String contentType = response.getContentType();
 				if(contentType!=null) {
 					if(contentType.contains("application/json") || contentType.contains("application/javascript") 
-							|| contentType.contains("application/xml") || contentType.contains("text/xml")) {
-						msg = msg + "response:" + new String(copy, response.getCharacterEncoding()) + "\n";
+							|| contentType.contains("application/xml") || contentType.contains("text/xml")) {				
+						if (copy.length > 4 * 1024) {// 大于4k则不打印响应内容
+							msg = msg + "response: to large, length:" + copy.length + "\n";
+						} else {
+							msg = msg + "response:" + new String(copy, response.getCharacterEncoding()) + "\n";
+						}			            
 					}
 					msg = msg + "contentType:" + contentType;
 				} else {
