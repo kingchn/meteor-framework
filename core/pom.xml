@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.kingchn</groupId>
 	<artifactId>meteor-core</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.5.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Meteor :: Module :: Core</name>
 	<description>
@@ -41,23 +41,29 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		
 		<!-- 主要依赖库的版本定义 -->
-		<spring.version>4.3.7.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
-		<spring-data-jpa.version>1.11.22.RELEASE</spring-data-jpa.version><!-- 1.4.2.RELEASE 1.10.1.RELEASE 1.11.1.RELEASE-->
+		<spring.version>4.3.27.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
+		<spring-data-jpa.version>1.11.23.RELEASE</spring-data-jpa.version><!-- 1.4.2.RELEASE 1.10.1.RELEASE 1.11.1.RELEASE 1.11.22.RELEASE-->
+		<spring-data-redis.version>1.8.23.RELEASE</spring-data-redis.version><!-- 1.8.23.RELEASE 1.8.0.RELEASE -->
 		<aspectj.version>1.8.9</aspectj.version><!-- 1.7.3 1.8.9 -->
 		<servlet-api.version>3.0.1</servlet-api.version><!-- 3.0.1 3.1.0 -->
-		<meteor.version>1.0.5-SNAPSHOT</meteor.version>
+		<meteor.version>1.0.5.1-SNAPSHOT</meteor.version>
 		<commons-io.version>2.5</commons-io.version><!-- 2.4 -->
 		<commons-fileupload.version>1.3.3</commons-fileupload.version><!-- 1.2.2 1.3.2 -->
 		<commons-collections.version>3.2.2</commons-collections.version><!-- 3.2.1 3.2.2 -->		
 		<jodd.version>3.7</jodd.version>
-		<log4j.version>2.8.1</log4j.version>
-		<jackson.version>2.8.6</jackson.version><!-- 2.3.1 -->
-		<validation-api.version>1.1.0.Final</validation-api.version>
-		<hibernate.version>5.1.3.Final</hibernate.version><!-- 4.3.11.Final 5.2.5.Final 5.2.6.Final 5.1.3.Final-->
+		<log4j.version>2.13.3</log4j.version><!-- 2.8.1 -->
+		<jackson.version>2.11.1</jackson.version><!-- 2.3.1 2.8.6-->
+		<jackson-databind.version>2.11.1</jackson-databind.version><!-- jackson-databind有小版本升级2.8.11.6 -->
+		<validation-api.version>2.0.1.Final</validation-api.version><!-- 1.1.0.Final -->
+		<hibernate.version>5.4.18.Final</hibernate.version><!-- 4.3.11.Final 5.2.5.Final 5.2.6.Final 5.1.3.Final-->
+		<hibernate-validator.version>6.1.5.Final</hibernate-validator.version>
+		
 		<freemarker.version>2.3.23</freemarker.version><!-- 2.3.22 2.3.23 -->
 		<pagehelper.version>5.0.1</pagehelper.version><!-- 3.7.3 5.0.0 -->
 		<shiro.version>1.5.3</shiro.version><!-- 1.2.3 1.3.2 1.4.0-->		
-		<quartz.version>2.2.3</quartz.version>
+		<quartz.version>2.3.2</quartz.version><!-- 2.2.3 -->
+		<commons-email.version>1.5</commons-email.version>
+		<netty.version>4.1.50.Final</netty.version><!-- 4.1.42.Final -->
 		<junit.version>4.12</junit.version>		
 	</properties>
 
@@ -206,6 +212,11 @@
 		    <artifactId>jackson-dataformat-xml</artifactId>
 		    <version>${jackson.version}</version>
 		</dependency>
+		<dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		    <version>${jackson-databind.version}</version>
+		</dependency>
 		<!-- jackson end -->
 		
 		<!-- validation start  -->
@@ -225,7 +236,7 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>${hibernate.version}</version>
+			<version>${hibernate-validator.version}</version>
 		</dependency>
 		<!-- hibernate end -->
 		
@@ -298,13 +309,13 @@
 		<dependency>  
 	        <groupId>org.springframework.data</groupId>  
 	        <artifactId>spring-data-redis</artifactId>  
-	        <version>1.8.0.RELEASE</version>  
+	        <version>${spring-data-redis.version}</version>
 	    </dependency>
 		
 		<dependency>
 	  		<groupId>org.apache.commons</groupId>
 	  		<artifactId>commons-email</artifactId>
-	  		<version>1.4</version>
+	  		<version>${commons-email.version}</version>
 	  		<type>jar</type>
 	  		<scope>compile</scope>
 	  	</dependency>
@@ -318,7 +329,7 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.1.42.Final</version> 
+			<version>${netty.version}</version> 
 		</dependency>
 	  	
 	  	<!-- TIMER -->
@@ -369,6 +380,22 @@
 
 	<build>
 		<plugins>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 	

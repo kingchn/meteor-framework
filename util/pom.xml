@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.kingchn</groupId>
 	<artifactId>meteor-util</artifactId>
-	<version>1.0.5-SNAPSHOT</version>
+	<version>1.0.5.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Meteor :: Module :: Util</name>
 	<description>
@@ -41,15 +41,16 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		
 		<!-- 主要依赖库的版本定义 -->
-		<spring.version>4.3.7.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
-		<log4j.version>2.8.1</log4j.version>
+		<spring.version>4.3.27.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
+		<log4j.version>2.13.3</log4j.version>
 		<commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.5</commons-io.version><!-- 2.4 -->
-		<commons-beanutils.version>1.9.2</commons-beanutils.version><!-- 1.8.3 -->
-		<poi.version>3.15</poi.version>
+		<commons-beanutils.version>1.9.4</commons-beanutils.version><!-- 1.8.3 1.9.2-->
+		<poi.version>4.1.2</poi.version><!-- 3.15 -->
 		<orika.version>1.5.1</orika.version>
-		<dozer.version>5.5.1</dozer.version>
-		<zxing.version>3.3.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 -->
+		<!-- <dozer.version>5.5.1</dozer.version> -->
+		<dozer.github.version>6.5.0</dozer.github.version>
+		<zxing.version>3.4.0</zxing.version><!-- 3.1.0 --><!-- 3.2.1 3.3.0-->
 		<httpclient.version>4.5.3</httpclient.version>
 		<junit.version>4.12</junit.version>
 		<!-- <commons-lang3.version>3.5</commons-lang3.version>
@@ -132,11 +133,16 @@
 			<!-- <optional>true</optional> -->
 		</dependency>		
 		
-		<dependency>
+		<!-- <dependency>
 		    <groupId>net.sf.dozer</groupId>
 		    <artifactId>dozer</artifactId>
 		    <version>${dozer.version}</version>
-		</dependency>
+		</dependency> -->
+		<dependency>
+            <groupId>com.github.dozermapper</groupId>
+            <artifactId>dozer-core</artifactId>
+            <version>${dozer.github.version}</version>
+        </dependency>
 		<!-- bean mapper end -->
 		
 		<!-- qrcode start -->
@@ -219,6 +225,22 @@
 
 	<build>
 		<plugins>
+			<plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 

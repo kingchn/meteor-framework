@@ -41,7 +41,7 @@ public class AESUtils {
 			SecretKey secretKey = kgen.generateKey();
 			byte[] enCodeFormat = secretKey.getEncoded();
 			SecretKeySpec secretKeySpec = new SecretKeySpec(enCodeFormat, "AES");
-			Cipher cipher = Cipher.getInstance("AES");// 创建密码器
+			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");// 创建密码器
 			byte[] byteContent = content.getBytes("UTF-8");
 			cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);// 初始化
 			byte[] result = cipher.doFinal(byteContent);
@@ -76,7 +76,7 @@ public class AESUtils {
 			SecretKey secretKey = kgen.generateKey();
 			byte[] enCodeFormat = secretKey.getEncoded();
 			SecretKeySpec secretKeySpec = new SecretKeySpec(enCodeFormat, "AES");
-			Cipher cipher = Cipher.getInstance("AES");// 创建密码器
+			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");// 创建密码器
 			cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);// 初始化
 			byte[] result = cipher.doFinal(content);
 			return result; // 加密
