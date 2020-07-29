@@ -96,13 +96,15 @@ public class BaseApiRequest implements Serializable {
 	}
 
 	public Map<String, Object> getAllRequestParams() {//不建议使用该方法，为了兼容已经调用该方法，以下在调用该方法时处理过滤不安全信息
-		for (String key : allRequestParams.keySet()) {
-			Object value = allRequestParams.get(key);
-			if(value !=null && value instanceof String) {//过滤不安全信息
-				String valueString = XSSUtils.stripXSS("" + value);
-				allRequestParams.put(key, valueString);
+		if (allRequestParams != null) {
+			for (String key : allRequestParams.keySet()) {
+				Object value = allRequestParams.get(key);
+				if (value != null && value instanceof String) {// 过滤不安全信息
+					String valueString = XSSUtils.stripXSS("" + value);
+					allRequestParams.put(key, valueString);
+				}
 			}
-		}
+		}		
 		return allRequestParams;
 	}
 
