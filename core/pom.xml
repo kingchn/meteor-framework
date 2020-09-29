@@ -41,7 +41,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		
 		<!-- 主要依赖库的版本定义 -->
-		<spring.version>4.3.27.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
+		<spring.version>4.3.29.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
 		<spring-data-jpa.version>1.11.23.RELEASE</spring-data-jpa.version><!-- 1.4.2.RELEASE 1.10.1.RELEASE 1.11.1.RELEASE 1.11.22.RELEASE-->
 		<spring-data-redis.version>1.8.23.RELEASE</spring-data-redis.version><!-- 1.8.23.RELEASE 1.8.0.RELEASE -->
 		<aspectj.version>1.8.9</aspectj.version><!-- 1.7.3 1.8.9 -->

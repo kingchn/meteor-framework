@@ -41,7 +41,7 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		
 		<!-- 主要依赖库的版本定义 -->
-		<spring.version>4.3.27.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
+		<spring.version>4.3.29.RELEASE</spring.version><!-- 4.2.5.RELEASE 4.3.7.RELEASE -->
 		<log4j.version>2.13.3</log4j.version>
 		<commons-lang3.version>3.5</commons-lang3.version>
 		<commons-io.version>2.5</commons-io.version><!-- 2.4 -->
